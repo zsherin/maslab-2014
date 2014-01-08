@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/zach/Documents/Maslab/opencv/build/java/x64"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/jSSC-2.6.0-Release/jssc.jar" sourcepath="lib/jSSC-2.6.0-Release/src/jssc-2.6.0-src.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/kitbot-demo/lib/jSSC-2.6.0-Release/javadoc/jssc-2.6.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/zach/Documents/Maslab/opencv/build/java/opencv-248.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

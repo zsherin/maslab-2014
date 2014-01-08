@@ -4,6 +4,18 @@ import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 
+import org.opencv.core.Core;
+import org.opencv.core.Size;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.highgui.Highgui;
+import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.highgui.VideoCapture;
+import org.opencv.imgproc.*;
+
 public class KitBotMain {
 	
     public static void main(String[] args) {
@@ -27,11 +39,59 @@ public class KitBotMain {
     	
     	window.setSize(width,height);
     	window.setVisible(true);
-    	
+    	 System.out.println("Hello, OpenCV");
+		    // Load the native library.
+		    System.loadLibrary("opencv_java248");
+
+		    VideoCapture camera = new VideoCapture(1);
+		    camera.open(1); //Useless
+		    if(!camera.isOpened()){
+		        System.out.println("Camera Error");
+		    }
+		    else{
+		        System.out.println("Camera OK?");
+		    }
+		    
+		    Mat frame = new Mat();
+		    Mat frameOut = new Mat();
+
+		    Mat mask = new Mat();
+		    Mat maskOut = new Mat();
+		    //camera.grab();
+		    //System.out.println("Frame Grabbed");
+		    //camera.retrieve(frame);
+		    //System.out.println("Frame Decoded");
+		    
+			  
     	while ( true ) {
     		try {
     			Thread.sleep(100);
-    			view.repaint();
+    			camera.read(frame);
+ 			   
+ 			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
+ 			   
+ 			    frameOut.copyTo(mask);
+ 			    
+ 			    Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
+ 			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .8,.8);
+ 			    Moments mu = Imgproc.moments(maskOut, true);
+ 			    
+ 			    Point p = new Point(mu.get_m10()/mu.get_m00() , mu.get_m01()/mu.get_m00() );
+ 			    /* No difference
+ 			    camera.release();1
+ 			    */
+ 			    
+ 			    System.out.println("Captured Frame Width " + frame.width());
+ 			    System.out.println("x" + p.x +"y:"  +p.y);
+ 			    if(p.x > frame.width()/2)
+ 			    {
+ 					model.setMotors(0.2,-0.2);
+ 			    }
+ 			    if(p.x<frame.width()/2)
+ 			    {
+ 					model.setMotors(-0.2,0.2);
+ 			    }
+ 			    view.repaint();
     		} catch ( Exception e ) {}
     	}
     }
