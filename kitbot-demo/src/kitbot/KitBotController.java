@@ -6,7 +6,7 @@ import java.awt.event.MouseListener;
 public class KitBotController implements MouseListener {
 	private KitBotModel model;
 	private KitBotView view;
-	
+	public boolean EmgStop = false;
 	public KitBotController( KitBotModel model, KitBotView view ) {
 		this.model = model;
 		this.view = view;
@@ -26,6 +26,7 @@ public class KitBotController implements MouseListener {
 			model.setMotors(0.2,0.2);
 		} else if ( view.stop.contains(x,y) ) {
 			model.setMotors(0,0);
+			EmgStop = true;
 		}
 	}
 	

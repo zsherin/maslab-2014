@@ -10,7 +10,7 @@ public class KitBotModel {
     
 	public KitBotModel() {
 		try {
-			serialPort = new SerialPort("COM4");
+			serialPort = new SerialPort("COM3");
             serialPort.openPort();
             serialPort.setParams(115200, 8, 1, 0);
         }
@@ -24,7 +24,21 @@ public class KitBotModel {
 		motorB = (byte)(powerB*127);
 		modified();
 	}
-	
+	private double smoothMotor(double oldPower){
+		double newPower = oldPower;
+		int sign = (int)(newPower/Math.abs(newPower));
+		if (sign*newPower< 0.05){
+			if (sign*newPower >0.02){
+				newPower = sign*0.05;
+			}else{
+				newPower = 0.0;
+			}
+		}
+		if(sign*newPower>0.3){
+			newPower = sign*0.3;
+		}
+		return newPower;
+	}
 	public void modified() {
 		try {
 			byte[] data = new byte[4];

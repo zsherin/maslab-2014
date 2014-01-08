@@ -65,7 +65,7 @@ public class KitBotMain {
 			  
     	while ( true ) {
     		try {
-    			Thread.sleep(100);
+    			Thread.sleep(10);
     			camera.read(frame);
  			   
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
@@ -83,14 +83,18 @@ public class KitBotMain {
  			    
  			    System.out.println("Captured Frame Width " + frame.width());
  			    System.out.println("x" + p.x +"y:"  +p.y);
- 			    if(p.x > frame.width()/2)
- 			    {
- 					model.setMotors(0.2,-0.2);
+ 			    if(Double.isNaN(p.x)){
+ 			    	p.x = frame.width()/2;
+ 			    	p.y = frame.height()/2;
  			    }
- 			    if(p.x<frame.width()/2)
+ 			    float rolMag = (float) (0.6*((p.x - frame.width()/2 ) / frame.width()));
+ 			    float forMag = (float) (0.8*((p.y - frame.height()/2 ) / frame.height()));
+ 			    if(controller.EmgStop == true)
  			    {
- 					model.setMotors(-0.2,0.2);
+ 			    	model.setMotors(0,0);
+ 			    	break;
  			    }
+ 			    model.setMotors(-forMag-rolMag, -forMag +rolMag);
  			    view.repaint();
     		} catch ( Exception e ) {}
     	}
