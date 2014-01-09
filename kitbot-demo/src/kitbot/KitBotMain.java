@@ -52,7 +52,7 @@ public class KitBotMain {
 		        System.out.println("Camera OK?");
 		    }
 		    
-		    Mat frame = new Mat();
+		    Mat frame = new Mat(50,50,1);
 		    Mat frameOut = new Mat();
 
 		    Mat mask = new Mat();
@@ -62,10 +62,13 @@ public class KitBotMain {
 		    //camera.retrieve(frame);
 		    //System.out.println("Frame Decoded");
 		    
-			  
+
+    	long time = System.nanoTime();	  
     	while ( true ) {
     		try {
-    			Thread.sleep(10);
+    			long duration = System.nanoTime()- time;
+    			System.out.println("LoopTime:"+ duration + "nanosecond.");
+    			time = time + duration;
     			camera.read(frame);
  			   
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
@@ -87,15 +90,15 @@ public class KitBotMain {
  			    	p.x = frame.width()/2;
  			    	p.y = frame.height()/2;
  			    }
- 			    float rolMag = (float) (0.6*((p.x - frame.width()/2 ) / frame.width()));
- 			    float forMag = (float) (0.8*((p.y - frame.height()/2 ) / frame.height()));
+ 			    float rolMag = (float) (0.5*((p.x - frame.width()/2 ) / frame.width()));
+ 			    float forMag = (float) (0.4*((p.y - frame.height()/2) / frame.height()));
  			    if(controller.EmgStop == true)
  			    {
  			    	model.setMotors(0,0);
  			    	break;
  			    }
- 			    model.setMotors(-forMag-rolMag, -forMag +rolMag);
- 			    view.repaint();
+ 			    model.setMotors(forMag-rolMag, forMag +rolMag);
+ 			    //view.repaint();
     		} catch ( Exception e ) {}
     	}
     }

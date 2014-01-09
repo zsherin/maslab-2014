@@ -27,6 +27,7 @@ public class KitBotController implements MouseListener {
 		} else if ( view.stop.contains(x,y) ) {
 			model.setMotors(0,0);
 			EmgStop = true;
+			System.out.println("Stopped");
 		}
 	}
 	
