@@ -1,0 +1,23 @@
+This files describes the communication protocols between the laptop to the micrcontroller
+
+Objective: Laptop: Higher level control
+			Microcontroller:  Sensor data compression, motor controls.
+		
+The communication will be executed in an asynchorize fashion w/ the laptop always starting the dialogue.	
+
+<<Motor>>
+Laptop >> "A" Motor1  Motor2 "E" >> Micro   //Initiator
+
+<<Integrated Gyro Data>>
+Laptop >> "B" >> Micro //Initiator
+Micro >> Current_Heading dx dy >> Laptop //change in dx and dy since last call
+Laptop >> "E" >> Micro  //Ack
+
+<<Distance Sensor>>
+Laptop >> "C" >> Micro //initiator
+Micro >> {1...9} "e" >> Laptop //Smoothed Sensor Data
+Laptop >> "E" >> Micro //Ack
+
+
+
+

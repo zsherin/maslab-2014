@@ -7,7 +7,8 @@ public class KitBotModel {
 	private SerialPort serialPort;
     private byte motorA = 0;
     private byte motorB = 0;
-    
+    private double x = 0;
+    private double y = 0;
 	public KitBotModel() {
 		try {
 			serialPort = new SerialPort("COM3");
@@ -53,6 +54,18 @@ public class KitBotModel {
 		return newPower;
 	}
 	public void modified() {
+		try {
+			byte[] data = new byte[4];
+			data[0] = 'S';		// Start signal "S"
+			data[1] = motorA;	// Motor A data
+			data[2] = motorB;	// Motor B data
+			data[3] = 'E';		// End signal "E"
+			serialPort.writeBytes(data);
+		} catch ( Exception ex ) {
+			System.out.println(ex);
+		}
+	}
+	public void updateMotor(){
 		try {
 			byte[] data = new byte[4];
 			data[0] = 'S';		// Start signal "S"
