@@ -154,23 +154,19 @@ public:
     pinMode(echo, INPUT);
     start = 0;
     endx = 0;
-    attachInterrupt(echo, Ultra::irh, CHANGE);
+    attachInterrupt(echo, Ultra::sample, CHANGE);
   }
 
-  void irh() {
+  void sample() {
     if ( digitalRead(echo)==HIGH ) {
       start = micros();
     } 
     else {
-      endx = micros();
+      endx = micros();      
+      //25% EWMA filter
+      int diff =  endx - start;
+      data = 0.75*data + 0.25*diff;
     }
-    Ultra::sample();
-  }
-
-  void sample() {
-    //25% EWMA filter
-    int diff =  endx - start;
-    data = 0.75*data + 0.25*diff;
   }
   unsigned int readData(){
     return data;
