@@ -195,9 +195,9 @@ void loop() {
   digitalWrite(30,LOW);
   delay(60);
 
-  unsigned int diff = ultra.readData();
-  pwmWrite(24, diff*3/2);
-  SerialUSB.println(diff);
+  unsigned int range = ultra.readData();
+  pwmWrite(24, range*3/2);
+  SerialUSB.println(range);
 }
 
 
