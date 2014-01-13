@@ -1,75 +1,50 @@
-#include <Servo.h>
 
-// TODO:
-// [X] Serial Comm
-// [ ] Dagu Motor Controller
-// [X] Cytron Motor Controller
-// [X] Encoders
+/*
+MAPLE Microcontroller Code in Processing
 
-// [X] Servo
-// [X] HC-SR04 Sonic Range Finder
-// [X] Analog read
-// [X] Analog write
-// [X] Digital read
-// [X] Digital write
+
+TODO:
+1 Byte math check.
+2 Gyro misConfig Error.
+3 Gyro OOP Data.
+
+Completed:
+Componenet      OOP    SensorFilter   String(output)
+Gyro            [x]         []              []
+Motor/Encoder   [x]       [N/A]             []
+Sonar           [x]       [EMWA]              []
+
+Author:  MASLAB2014 TeamSeven @2014
+*/
+
+/*
+OOP specs
+
+Object.sample:  sample & store 1 data sample,  usually filter is in this.
+
+Object.readData:  for the main loop to grab the data.
+
+Actuator.set:  to set the actuator in a specific state{Motor: voltage}
+*/
+
+
 
 #define LED_PIN BOARD_LED_PIN
 
-/*
-// Serial test
- void setup() {
- pinMode(LED_PIN, OUTPUT);
- }
- 
- void loop() {
- delay(100);
- while (SerialUSB.available()) {
- char input = SerialUSB.read();
- SerialUSB.println(input);
- toggleLED();
- }
- }
- */
 
 
-
-/*
-volatile unsigned int count = 0;
- 
- void irh() {
- if ( digitalRead(28)==HIGH )
- count++;
- else
- count--;
- }
- 
- void setup() {
- noInterrupts();
- 
- // Set up the built-in LED pin as an output:
- pinMode(24, PWM);
- pinMode(26, INPUT);
- pinMode(28, INPUT);
- 
- attachInterrupt(26,irh,RISING);
- interrupts();
- }
- 
- void loop() {
- pwmWrite(24,count*10);
- }
- */
-// Gryo Reader
+// Gryo Reader V1.0
 HardwareSPI spi(1);
-class Gryo{
+class Gyro{
 public:
   uint8 writeBuf[4];
   uint8 readBuf[4];
-  Gryo(){
+  Gyro(){
     pinMode(9, OUTPUT);
     digitalWrite(9, HIGH);
     spi.begin(SPI_4_5MHZ, MSBFIRST, SPI_MODE_0);
   }
+  // TODO3 Understand Gyro output and oop data.
   void sample(){
     writeBuf[0] = 0x20;
     writeBuf[1] = 0x00;
@@ -106,17 +81,14 @@ public:
     } 
     else {
       // not sensor data; could be a R/W error message
+      // TODO2 add gyro Misconfig Error
     }
   }
-
-
 }
 
 
 
-// Motor Controller
-
-
+// Motor Controller V1.0
 class Motor {
   //Motor Control
 public:
@@ -128,7 +100,7 @@ public:
   boolean encoder = false;
   volatile unsigned int count = 0;
   
-  void irh() {
+  void sample() {
     if ( digitalRead(encoder2Pin)==HIGH )
       count++;
     else
@@ -141,7 +113,7 @@ public:
     pinMode(dirPin, OUTPUT);
     pinMode(encoder1Pin, INPUT);
     pinMode(encoder2Pin, INPUT);
-    attachInterrupt(encoder1Pin,Motor:irh,RISING);
+    attachInterrupt(encoder1Pin,Motor:sample,RISING);
     encoder = true;
     dir = 0;
     Motor::set(dir);
@@ -155,26 +127,27 @@ public:
   }
   void set(byte _dir): 
   dir(_dir){
-    digitalWrite(dirPin,dir/abs(dir));//TODO Critical Assumption:  Byte division behavior need to be checked.
+    digitalWrite(dirPin,dir/abs(dir));//TODO1 Critical Assumption:  Byte division behavior need to be checked.
     pwmWrite(pwmPin,abs(dir));
   }
-  int sample(){
+  int readData(){
     if (encoder)
       return count;
     else
       return null;
+    
   }
 }
 
-// Sonic Range Finder
 
+// Ultrasonic Range  Finder V1.0
 class Ultra {
 public:
   uint8 trig;
   uint8 echo;
   volatile unsigned int start;
   volatile unsigned int endx;
-
+  unsigned int data = 0;
   Ultra(uint8 _trig, uint8 _echo) : 
   trig(_trig), echo(_echo) {
     pinMode(trig, OUTPUT);
@@ -191,12 +164,22 @@ public:
     else {
       endx = micros();
     }
+    Ultra::sample();
   }
 
-  unsigned int diff() {
-    return endx - start;
+  void sample() {
+    //25% EWMA filter
+    int diff =  endx - start;
+    data = 0.75*data + 0.25*diff;
+  }
+  unsigned int readData(){
+    return data;
   }
 }
+
+
+
+//Main LOOP
 
 Ultra ultra;
 
@@ -216,92 +199,10 @@ void loop() {
   digitalWrite(30,LOW);
   delay(60);
 
-  unsigned int diff = ultra.diff();
+  unsigned int diff = ultra.readData();
   pwmWrite(24, diff*3/2);
   SerialUSB.println(diff);
 }
 
 
-/*
-// Servo
- Servo servo;
- 
- void setup() {
- servo.attach(1);
- 
- // Set up the built-in LED pin as an output:
- //pinMode(24, PWM);
- }
- 
- int i = 0;
- void loop() {
- //pwmWrite(24,i);
- servo.write(i);
- delay(1000);
- i += 5;
- if ( i > 180 ) i = 0;
- }
- */
-
-/*
-// Analog Write
- void setup() {
- // Set up the built-in LED pin as an output:
- pinMode(24, PWM);
- }
- 
- int i = 0;
- void loop() {
- pwmWrite(24,i*100);
- delay(10);
- i += 2;
- }
- */
-
-/*
-// Analog Read
- // Requires port labeled with AIN (from what I can tell)
- void setup() {
- pinMode(2, INPUT_ANALOG);
- }
- 
- int i = 0;
- void loop() {
- uint16 val = analogRead(2);
- SerialUSB.print((char) (val >> 8));
- delay(100);
- }
- */
-
-/*
-// Digital Write
- void setup() {
- // Set up the built-in LED pin as an output:
- pinMode(24, OUTPUT);
- }
- 
- int i = 0;
- void loop() {
- digitalWrite(24,HIGH);
- delay(500);
- digitalWrite(24,LOW);
- delay(500);
- }
- */
-
-/*
-// Digital Read
- void setup() {
- // Set up the built-in LED pin as an output:
- pinMode(24, OUTPUT);
- pinMode(23, INPUT);
- }
- 
- int i = 0;
- void loop() {
- int val = digitalRead(23);
- digitalWrite(24,val);
- delay(50);
- }
- */
 
