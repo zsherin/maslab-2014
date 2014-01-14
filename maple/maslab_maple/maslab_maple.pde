@@ -38,9 +38,15 @@ Actuator.set:  to set the actuator in a specific state{Motor: voltage}
 HardwareSPI spi(1);
 class Gyro{
 public:
+  double dx;
+  double dy;
+  double heading;
   uint8 writeBuf[4];
   uint8 readBuf[4];
   Gyro(){
+    dx =0;
+    dy = 0;
+    heading =0;
     pinMode(9, OUTPUT);
     digitalWrite(9, HIGH);
     spi.begin(SPI_4_5MHZ, MSBFIRST, SPI_MODE_0);
@@ -187,6 +193,7 @@ Ultra ultra4 = Ultra(30,29);
 Ultra ultra5 = Ultra(32,31);
 Ultra ultra6 = Ultra(34,33);
 Ultra ultra7 = Ultra(36,35);
+Gyro gyro = Gyro();
 void ultra1ISR(){
   ultra1.sample();
 }
@@ -210,18 +217,19 @@ void ultra7ISR(){
 }
 void setup() {
   noInterrupts();
-  attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
-  attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
-  attachInterrupt(ultra3.echo, ultra3ISR, CHANGE);
-  attachInterrupt(ultra4.echo, ultra4ISR, CHANGE);
-  attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
-  attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
-  attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
+  //attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
+  //attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
+  //attachInterrupt(ultra3.echo, ultra3ISR, CHANGE);
+  //attachInterrupt(ultra4.echo, ultra4ISR, CHANGE);
+  //attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
+  //attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
+  //attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
   interrupts();
 }
 
+
 void loop() {
-  digitalWrite(24,HIGH);
+  /*digitalWrite(24,HIGH);
   digitalWrite(26,HIGH);
   digitalWrite(28,HIGH);
   digitalWrite(30,HIGH);
@@ -260,6 +268,9 @@ void loop() {
   SerialUSB.print(range6);
   SerialUSB.print("||");
   SerialUSB.println(range7);
+  */
+  gyro.sample();
+  delay(100);
 }
 
 
