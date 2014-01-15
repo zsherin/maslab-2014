@@ -1,10 +1,17 @@
 package kitbot;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import org.opencv.core.Core;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Size;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
@@ -16,7 +23,34 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.*;
 
+
 public class KitBotMain {
+	static Point oldP;
+	private static Point GetClosest( List<MatOfPoint> contours, double dist)
+	   {
+		   int minArea = 10;
+		   Point p = new Point();
+		   for (int idx = 0; idx < contours.size(); idx++) {
+		        Mat contour = contours.get(idx);
+		        double contourarea = Imgproc.contourArea(contour);
+		        if (contourarea > minArea) 
+		        {
+		        	Moments mu = Imgproc.moments(contour, true);
+		            int x = (int) (mu.get_m10() / mu.get_m00());
+		            int y = (int) (mu.get_m01() / mu.get_m00());
+
+				    System.out.println(oldP);
+				    
+		            double newDist = Math.sqrt(Math.pow((x-oldP.x), 2)+Math.pow((y-oldP.y), 2));
+		            if(newDist < dist)
+		            {
+		            	p = new Point(x,y);
+		            	dist = newDist;
+		            }
+		        }
+		    }
+		   return p;
+	   }
 	
     public static void main(String[] args) {
     	int width = 1366;
@@ -43,7 +77,7 @@ public class KitBotMain {
 		    // Load the native library.
 		    System.loadLibrary("opencv_java248");
 		    VideoCapture camera = new VideoCapture(1);
-		    camera.open(1); //Useless
+		    camera.open(1); //Not Useless, actually
 		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
 		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,720);
 		    System.out.println(hset);
@@ -60,30 +94,51 @@ public class KitBotMain {
 		    Mat frameOut = new Mat();
 
 		    Mat mask = new Mat();
+		    Mat maskTwo = new Mat();
 		    Mat maskOut = new Mat();
 		    //camera.grab();
 		    //System.out.println("Frame Grabbed");
 		    //camera.retrieve(frame);
 		    //System.out.println("Frame Decoded");
-		    
+		     width = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_WIDTH));
+			 height = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT));
+			JLabel opencvPane = createWindow("OpenCV output", width, height);
+
 
     	long time = System.nanoTime();	  
     	while ( true ) {
     		try {
     			long duration = (System.nanoTime()- time)/(long)Math.pow(10.0,9.0);// In seconds
-    			System.out.println("Current Fps:"+ 1/duration + "frame/Second.");
+    			System.out.println("Current Fps:"+ 1.0/duration + "frame/Second.");
     			time = time + duration;
-    			
+
+ 			    System.out.println("HI");
     			camera.read(frame);
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
- 			    Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
- 			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .8,.8);
- 			    Moments mu = Imgproc.moments(maskOut, true);
- 			    Point p = new Point(mu.get_m10()/mu.get_m00() , mu.get_m01()/mu.get_m00() );
- 			    /* No difference
- 			    camera.release();1
- 			    */
+ 			   //RED: 
+			    Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
+			    //Core.inRange(frameOut,new Scalar(170,160,60) , new Scalar(180,256,256), maskTwo); 
+			    //GREEN:
+			    //Core.inRange(frameOut,new Scalar(38,160,60) , new Scalar(75,256,256), mask); 
+			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
+			    /* No difference
+			    camera.release();1
+			    */
+			    //Okay! Here's the contour finding for getting the center of mass of each blob
+			    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+			    Imgproc.findContours(mask, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+			   
+			    Point p = GetClosest(contours,10000000);
+			    //Imgproc.findContours(maskTwo, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+			    
+			    //p = GetClosest(contours, ( Math.sqrt(Math.pow((p.x-oldP.x), 2)+Math.pow((p.y-oldP.y), 2))));
+
+			    
+            	Core.circle(frame, p, 4, new Scalar(255,49,0,255));
+            	oldP =p;
+			   
+				updateWindow(opencvPane, frame);
  			    
  			    System.out.println("Captured Frame Width " + frame.width());
  			    System.out.println("x" + p.x +"y:"  +p.y);
@@ -114,5 +169,27 @@ public class KitBotMain {
     		} catch ( Exception e ) {}
     	}
     }
+    private static JLabel createWindow(String name, int width, int height) {    
+        JFrame imageFrame = new JFrame(name);
+        imageFrame.setSize(width, height);
+        imageFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        JLabel imagePane = new JLabel();
+        imagePane.setLayout(new BorderLayout());
+        imageFrame.setContentPane(imagePane);
+        
+        imageFrame.setVisible(true);
+        return imagePane;
+    }
+    private static void updateWindow(JLabel imagePane, Mat mat) {
+    	int w = (int) (mat.size().width);
+    	int h = (int) (mat.size().height);
+    	if (imagePane.getWidth() != w || imagePane.getHeight() != h) {
+    		imagePane.setSize(w, h);
+    	}
+    	BufferedImage bufferedImage = Mat2Image.getImage(mat);
+    	imagePane.setIcon(new ImageIcon(bufferedImage));
+    }
+
     
 }
