@@ -10,6 +10,7 @@ public class KitBotModel {
     private byte motorB = 0;
     private double x = 0;
     private double y = 0;
+    private double heading = 0;
     private byte sonar[] = new byte[7];
     /**
      * Initializer
@@ -52,6 +53,9 @@ public class KitBotModel {
 			return -1;
 		return oldpower;
 	}
+	
+	
+	//SENSORY UPDATES
 	/**
 	 * updateMotor sends command to the Microcontroller and updates the motors.
 	 * It uses the motor value within, so no arguments needed.
@@ -78,11 +82,29 @@ public class KitBotModel {
 		try{
 			serialPort.writeByte((byte)'C');
 			sonar = serialPort.readBytes(7);
-			
+			serialPort.writeByte((byte)'E');
 		}catch (Exception ex){
 			
 		}
 		return sonar;
+	}
+	/**
+	 * updatePos gets positional updates from the microcontroller
+	 * @return byte[] :  Heading, change in x, change in y.
+	 */
+	public byte[] updatePos(){
+		byte data[] = new byte[3];
+		try{
+			serialPort.writeByte((byte)'B');
+			data = serialPort.readBytes(3);
+			serialPort.writeByte((byte)'E');
+			heading = data[0];
+			x += data[1];
+			y += data[2];
+		}catch(Exception ex){
+			
+		}
+		return data;
 	}
 	/**
 	 * finalize closes the Serial Communication.
