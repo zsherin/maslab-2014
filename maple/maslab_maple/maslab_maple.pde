@@ -1,4 +1,4 @@
-
+#include <Wire.h>
 
 /*
 MAPLE Microcontroller Code in Processing
@@ -8,12 +8,14 @@ TODO:
 1 Byte math check.
 2 Gyro misConfig Error.
 3 Gyro OOP Data.
+4 Add MC and BMP checks
 
 Completed:
 Componenet      OOP    SensorFilter   String(output)
 Gyro            [x]         []              []
 Motor/Encoder   [x]       [N/A]             []
 Sonar           [x]       [EMWA]              []
+Acc             [x]        
 
 Author:  MASLAB2014 TeamSeven @2014
 */
@@ -29,21 +31,128 @@ Actuator.set:  to set the actuator in a specific state{Motor: voltage}
 */
 
 
-
-#define LED_PIN BOARD_LED_PIN
+// Acc Reader V1.0
+//I2C addresses
+byte GyroL3 = 0x69; //L3G4200D Gyro
+byte AccAD = 0x53;  //ADXL345 Accelerometer
+byte ComMC = 0x1E;  //HMC5883L Magnetic Compass
+byte BaroBM = 0x77; //BMP085 Barometer + Thermometer
+class Acc{
+  //Acc scale = 8/1024 (8G) = 0.0078
+  public:
+  double dxt;
+  double dyt;
+  double heading;
+  long AccTime;
+  long GyroTime;
+  Wire wire;
+  Acc(){
+    dxt = 0;
+    dyt = 0;
+    heading = 0;
+    wire = Wire();
+    wire.begin();
+    //Begin I2C Testing.
+    wire.beginTransmission(AccAD);
+    wire.write(0x00);
+    if(wire.read()!=0xE5){
+      SerialUSB.println("Error ADSL345 Accelerometer: Not recognized in I2C.  Incorrect ID received.");
+    }
+    wire.endTransmission();
+    
+    wire.beginTransmission(GyroL3);
+    wire.write(0x0F);
+    if(wire.read()!=0xD3){
+      SerialUSB.println("Error L3G4200D Gyro: Not recognized in I2C.  Incorrect ID received.");
+    }
+    wire.endTransmission();
+    //TODO4 add check to MC and BMP
+    AccTime = micros();
+    GyroTime = micros();
+  }
+  
+  void ComSample(){
+    wire.beginTransmission(ComMC);
+    //X
+    double x = 0;
+    wire.write(0x05);
+    x += wire.read();
+    wire.write(0x06);;
+    x = wire.read() + x*1024;
+    double y = 0;
+    wire.write(0x07);
+    y += wire.read();
+    wire.write(0x08);;
+    y = wire.read() + y*1024;
+    heading += 0.95*heading + 0.05*atan((float)x/y);
+    wire.endTransmission();
+  }
+  void GyroSample(){
+    long Time = micros();
+    long dt = Time - GyroTime;
+    wire.beginTransmission(GyrooL3);
+    byte[] out =[];
+    wire.write(0x2C);
+    delay(1);
+    out += wire.read();
+    wire.write(0x2D);
+    delay(1);
+    out += wire.read();
+    long ddz = out[0]*1024 + out[1];
+    heading += ddz(2*PI/365)*Time;
+    wire.endTransmission();
+  }
+  void AccSample(){
+    long Time = micros();
+    long dt = Time - AccTime;
+    wire.beginTransmission(AccAD);
+    byte[] out = [];
+    //begin reading from X axis.
+    wire.write(0x32);
+    delay(1);
+    out += wire.read();
+    wire.write(0x33);
+    delay(1);
+    out += wire.read();
+    double ddx = wire[0]*1024 + wire[1];
+    dxt += ddx*dt*dt;
+    //Y
+    wire.write(0x34);
+    delay(1);
+    out += wire.read();
+    wire.write(0x35);
+    delay(1);
+    out += wire.read();
+    double ddy = wire[2]*1024 + wire[3];
+    dyt += ddy*dt*dt;
+    
+    //Z
+    wire.write(0x36);
+    delay(1);
+    out += wire.read();
+    wire.write(0x37);
+    delay(1);
+    out += wire.read();
+    AccTime = Time;
+    return out;
+  }
+  double[] readData(){
+    return [dx,dy,heading];
+  }
+}
 
 
 
 // Gryo Reader V1.0
 HardwareSPI spi(1);
-class Gyro{
+class FancyGyro{
 public:
   double dx;
   double dy;
   double heading;
   uint8 writeBuf[4];
   uint8 readBuf[4];
-  Gyro(){
+  FancyGyro(){
     dx =0;
     dy = 0;
     heading =0;
@@ -79,7 +188,6 @@ public:
     if (test == 0b00000100) {
       uint16 temp0 = (uint16) readBuf[0];
       uint16 temp1 = (uint16) readBuf[1];
-
       uint16 unsignedData = (readBuf[2] >> 2);
       unsignedData += (temp1 << 6);
       unsignedData += (temp0 << 14);
@@ -173,7 +281,7 @@ public:
     else {
       endx = micros();      
       //25% EWMA filter
-      int diff =  endx - start;
+      int diff =  (endx - start)/58;
       data = 0.95*data + 0.05*diff;
     }
   }
