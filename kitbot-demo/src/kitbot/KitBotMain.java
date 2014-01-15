@@ -45,8 +45,8 @@ public class KitBotMain {
 
 		    VideoCapture camera = new VideoCapture(1);
 		    camera.open(1); //Useless
-		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,800);
-		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,1280);
+		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
+		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,720);
 		    System.out.println(hset);
 		    System.out.println(wset);
 		    System.out.println("CameraSet!");
@@ -100,7 +100,11 @@ public class KitBotMain {
  			    double desiredDist = 0.2;//m;
  			    double setCamAngle =  0.785398163;//radian
  			    //Some Math
+ 			    //p.yConstrain
  			    double trackAngle = ((p.y - frame.height()/2) / frame.height())*0.589048625;//radian
+ 			    if(trackAngle + setCamAngle > Math.PI/2-0.1){ //Set hard limit that ball can only be 2m away.
+ 			    	trackAngle = Math.PI/2 - 0.1 -setCamAngle;
+ 			    }
  			    double forMag = 2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
  			    if(controller.EmgStop == true)
  			    {
