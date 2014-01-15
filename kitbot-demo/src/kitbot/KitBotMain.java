@@ -45,6 +45,11 @@ public class KitBotMain {
 
 		    VideoCapture camera = new VideoCapture(1);
 		    camera.open(1); //Useless
+		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,800);
+		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,1280);
+		    System.out.println(hset);
+		    System.out.println(wset);
+		    System.out.println("CameraSet!");
 		    if(!camera.isOpened()){
 		        System.out.println("Camera Error");
 		    }
@@ -86,12 +91,17 @@ public class KitBotMain {
  			    
  			    System.out.println("Captured Frame Width " + frame.width());
  			    System.out.println("x" + p.x +"y:"  +p.y);
- 			    if(Double.isNaN(p.x)){
+ 			    if(Double.isNaN(p.x)){ 
  			    	p.x = frame.width()/2;
  			    	p.y = frame.height()/2;
  			    }
- 			    float rolMag = (float) (0.5*((p.x - frame.width()/2 ) / frame.width()));
- 			    float forMag = (float) (0.4*((p.y - frame.height()/2) / frame.height()));
+ 			    double rolMag = 0.5*((p.x - frame.width()/2 ) / frame.width());
+ 			    double camHeight = 0.1778;//m
+ 			    double desiredDist = 0.2;//m;
+ 			    double setCamAngle =  0.785398163;//radian
+ 			    //Some Math
+ 			    double trackAngle = ((p.y - frame.height()/2) / frame.height())*0.589048625;//radian
+ 			    double forMag = 2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
  			    if(controller.EmgStop == true)
  			    {
  			    	model.setMotors(0,0);
