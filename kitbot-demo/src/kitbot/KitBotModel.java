@@ -83,6 +83,7 @@ public class KitBotModel {
 			serialPort.writeByte((byte)'C');
 			sonar = serialPort.readBytes(7);
 			serialPort.writeByte((byte)'E');
+			System.out.println("Got Sonar Data:" + sonar);
 		}catch (Exception ex){
 			
 		}
@@ -101,6 +102,7 @@ public class KitBotModel {
 			heading = data[0];
 			x += data[1];
 			y += data[2];
+			System.out.println("Got Pos Data:" + data);
 		}catch(Exception ex){
 			
 		}
