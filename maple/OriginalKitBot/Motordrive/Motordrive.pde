@@ -34,7 +34,7 @@ void loop() {
     buf[charCount % 4] = ch;
     
     SerialUSB.print(charCount);
-    if (charCount == 0 && ch != 'S') {
+    if (charCount == 0 && ch != 'A') {
       continue;  
     }
     
@@ -55,6 +55,7 @@ void setMotors(int8 velA, int8 velB) {
   pwmWrite(MOT_A_PWM, calcPwm(velA));
   digitalWrite(MOT_B_DIR, calcDir(velB));
   pwmWrite(MOT_B_PWM, calcPwm(velB));
+  SerialUSB.println("MotorSet");
 }
 
 uint16 calcPwm(int8 inputVel) {
