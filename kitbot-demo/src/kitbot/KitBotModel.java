@@ -11,7 +11,7 @@ public class KitBotModel {
     private double y = 0;
 	public KitBotModel() {
 		try {
-			serialPort = new SerialPort("COM3");
+			serialPort = new SerialPort("COM6");
             serialPort.openPort();
             serialPort.setParams(115200, 8, 1, 0);
         }

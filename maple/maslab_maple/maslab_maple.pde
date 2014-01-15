@@ -45,101 +45,98 @@ class Acc{
   double heading;
   long AccTime;
   long GyroTime;
-  Wire wire;
   Acc(){
     dxt = 0;
     dyt = 0;
     heading = 0;
-    wire = Wire();
-    wire.begin();
+    Wire.begin();
     //Begin I2C Testing.
-    wire.beginTransmission(AccAD);
-    wire.write(0x00);
-    if(wire.read()!=0xE5){
+    Wire.beginTransmission(AccAD);
+    Wire.send(0x00);
+    if(Wire.receive()!=0xE5){
       SerialUSB.println("Error ADSL345 Accelerometer: Not recognized in I2C.  Incorrect ID received.");
     }
-    wire.endTransmission();
+    Wire.endTransmission();
     
-    wire.beginTransmission(GyroL3);
-    wire.write(0x0F);
-    if(wire.read()!=0xD3){
+    Wire.beginTransmission(GyroL3);
+    Wire.send(0x0F);
+    if(Wire.receive()!=0xD3){
       SerialUSB.println("Error L3G4200D Gyro: Not recognized in I2C.  Incorrect ID received.");
     }
-    wire.endTransmission();
+    Wire.endTransmission();
     //TODO4 add check to MC and BMP
     AccTime = micros();
     GyroTime = micros();
   }
   
   void ComSample(){
-    wire.beginTransmission(ComMC);
+    Wire.beginTransmission(ComMC);
     //X
     double x = 0;
-    wire.write(0x05);
-    x += wire.read();
-    wire.write(0x06);;
-    x = wire.read() + x*1024;
+    Wire.send(0x05);
+    x += Wire.receive();
+    Wire.send(0x06);;
+    x = Wire.receive() + x*1024;
     double y = 0;
-    wire.write(0x07);
-    y += wire.read();
-    wire.write(0x08);;
-    y = wire.read() + y*1024;
+    Wire.send(0x07);
+    y += Wire.receive();
+    Wire.send(0x08);;
+    y = Wire.receive() + y*1024;
     heading += 0.95*heading + 0.05*atan((float)x/y);
-    wire.endTransmission();
+    Wire.endTransmission();
   }
   void GyroSample(){
     long Time = micros();
     long dt = Time - GyroTime;
-    wire.beginTransmission(GyrooL3);
-    byte[] out =[];
-    wire.write(0x2C);
+    Wire.beginTransmission(GyroL3);
+    uint8 out[] ={};
+    Wire.send(0x2C);
     delay(1);
-    out += wire.read();
-    wire.write(0x2D);
+    out[0] = Wire.receive();
+    Wire.send(0x2D);
     delay(1);
-    out += wire.read();
+    out[1] =  Wire.receive();
     long ddz = out[0]*1024 + out[1];
-    heading += ddz(2*PI/365)*Time;
-    wire.endTransmission();
+    heading += ddz*(2*PI/365)*Time;
+    Wire.endTransmission();
   }
   void AccSample(){
     long Time = micros();
     long dt = Time - AccTime;
-    wire.beginTransmission(AccAD);
-    byte[] out = [];
+    Wire.beginTransmission(AccAD);
+    uint8 out[] = {};
     //begin reading from X axis.
-    wire.write(0x32);
+    Wire.send(0x32);
     delay(1);
-    out += wire.read();
-    wire.write(0x33);
+    out[0] =  Wire.receive();
+    Wire.send(0x33);
     delay(1);
-    out += wire.read();
-    double ddx = wire[0]*1024 + wire[1];
+    out[1] = Wire.receive();
+    double ddx = out[0]*1024 + out[1];
     dxt += ddx*dt*dt;
     //Y
-    wire.write(0x34);
+    Wire.send(0x34);
     delay(1);
-    out += wire.read();
-    wire.write(0x35);
+    out[2] = Wire.receive();
+    Wire.send(0x35);
     delay(1);
-    out += wire.read();
-    double ddy = wire[2]*1024 + wire[3];
+    out[3] = Wire.receive();
+    double ddy = out[2]*1024 + out[3];
     dyt += ddy*dt*dt;
     
     //Z
-    wire.write(0x36);
+    Wire.send(0x36);
     delay(1);
-    out += wire.read();
-    wire.write(0x37);
+    out[4] = Wire.receive();
+    Wire.send(0x37);
     delay(1);
-    out += wire.read();
+    out[5] = Wire.receive();
     AccTime = Time;
-    return out;
   }
-  double[] readData(){
-    return [dx,dy,heading];
+  double readData(){
+    return dxt;//TODO return 
   }
-}
+};
 
 
 
@@ -211,19 +208,18 @@ public:
   uint8 dirPin;
   uint8 encoder1Pin;
   uint8 encoder2Pin;
-  byte dir;
   boolean encoder;
   volatile unsigned int count;
   
   Motor(uint8 _pwmPin, uint8 _dirPin, uint8 _encoder1Pin, uint8 _encoder2Pin) : 
   pwmPin(_pwmPin), dirPin(_dirPin), encoder1Pin(_encoder1Pin), encoder2Pin(_encoder2Pin){
-    pinMode(pwmPin, OUTPUT);
+    pinMode(pwmPin, PWM );
     pinMode(dirPin, OUTPUT);
     pinMode(encoder1Pin, INPUT);
     pinMode(encoder2Pin, INPUT);
     //attachInterrupt(encoder1Pin,sample, RISING);
     encoder = true;
-    dir = 0;
+    int8 dir = 0;
     count =0;
     set(dir);
   }
@@ -235,16 +231,20 @@ public:
   }
   Motor(uint8 _pwmPin, uint8 _dirPin) : 
   pwmPin(_pwmPin), dirPin(_dirPin){
-    pinMode(pwmPin, OUTPUT);
+    pinMode(pwmPin, PWM);
     pinMode(dirPin, OUTPUT);
     encoder = false;
-    dir = 0;
+    int8 dir = 0;
     set(dir);
   }
-  void set(byte _dir){
-    dir = _dir;
-    digitalWrite(dirPin,dir/abs(dir));//TODO1 Critical Assumption:  Byte division behavior need to be checked.
-    pwmWrite(pwmPin,abs(dir));
+  void set(int8 dir){
+    uint16 dirMag = dir > 0 ? dir : -dir;
+    uint16 pwm = (dirMag == 128) ? 65535 : dirMag << 9;
+    SerialUSB.print(pwmPin);
+    SerialUSB.print("||");
+    SerialUSB.println(dir);
+    digitalWrite(dirPin,(dir>0));//TODO1 Critical Assumption:  Byte division behavior need to be checked.
+    pwmWrite(pwmPin,pwm);
   }
   int readData(){
     if (encoder)
@@ -301,7 +301,9 @@ Ultra ultra4 = Ultra(30,29);
 Ultra ultra5 = Ultra(32,31);
 Ultra ultra6 = Ultra(34,33);
 Ultra ultra7 = Ultra(36,35);
-Gyro gyro = Gyro();
+FancyGyro gyro = FancyGyro();
+Motor motorL = Motor(3,2);
+Motor motorR = Motor(6,5);
 void ultra1ISR(){
   ultra1.sample();
 }
@@ -323,21 +325,51 @@ void ultra6ISR(){
 void ultra7ISR(){
   ultra7.sample();
 }
+int charCount;
 void setup() {
+  /*
   noInterrupts();
-  //attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
-  //attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
-  //attachInterrupt(ultra3.echo, ultra3ISR, CHANGE);
-  //attachInterrupt(ultra4.echo, ultra4ISR, CHANGE);
-  //attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
-  //attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
-  //attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
+  attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
+  attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
+  attachInterrupt(ultra3.echo, ultra3ISR, CHANGE);
+  attachInterrupt(ultra4.echo, ultra4ISR, CHANGE);
+  attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
+  attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
+  attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
   interrupts();
+  */
+  //For Motor
+  pinMode(4,OUTPUT);
+  pinMode(7,OUTPUT);
+  digitalWrite(4,LOW);
+  digitalWrite(7,LOW);
+  charCount = 0;
 }
 
-
+char buf[4];
 void loop() {
-  /*digitalWrite(24,HIGH);
+  if(SerialUSB.available()) {
+    char ch = SerialUSB.read();
+    buf[charCount % 4] = ch;
+    
+    SerialUSB.print(charCount);
+    if (charCount == 0 && ch != 'S') {
+      //charCount =0;
+      return;
+    }
+    
+    charCount++;
+    
+    if (ch == 'E') {
+      if (charCount == 4) {
+        motorL.set(buf[1]); 
+        motorR.set(buf[2]);
+      }
+      charCount = 0;
+    }
+  }
+  /*
+  digitalWrite(24,HIGH);
   digitalWrite(26,HIGH);
   digitalWrite(28,HIGH);
   digitalWrite(30,HIGH);
@@ -376,9 +408,9 @@ void loop() {
   SerialUSB.print(range6);
   SerialUSB.print("||");
   SerialUSB.println(range7);
-  */
   gyro.sample();
-  delay(100);
+  delay(10);
+  */
 }
 
 

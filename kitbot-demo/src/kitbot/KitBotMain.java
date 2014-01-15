@@ -97,7 +97,7 @@ public class KitBotMain {
  			    	model.setMotors(0,0);
  			    	break;
  			    }
- 			    model.setMotors(forMag-rolMag, forMag +rolMag);
+ 			    model.setMotors(forMag+rolMag, forMag -rolMag);
  			    //view.repaint();
     		} catch ( Exception e ) {}
     	}
