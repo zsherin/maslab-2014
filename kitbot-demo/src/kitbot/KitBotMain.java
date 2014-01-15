@@ -42,7 +42,6 @@ public class KitBotMain {
     	 System.out.println("Hello, OpenCV");
 		    // Load the native library.
 		    System.loadLibrary("opencv_java248");
-
 		    VideoCapture camera = new VideoCapture(1);
 		    camera.open(1); //Useless
 		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
@@ -71,19 +70,16 @@ public class KitBotMain {
     	long time = System.nanoTime();	  
     	while ( true ) {
     		try {
-    			long duration = System.nanoTime()- time;
-    			System.out.println("LoopTime:"+ duration + "nanosecond.");
+    			long duration = (System.nanoTime()- time)/(long)Math.pow(10.0,9.0);// In seconds
+    			System.out.println("Current Fps:"+ 1/duration + "frame/Second.");
     			time = time + duration;
+    			
     			camera.read(frame);
- 			   
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
- 			   
  			    frameOut.copyTo(mask);
- 			    
  			    Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
  			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .8,.8);
  			    Moments mu = Imgproc.moments(maskOut, true);
- 			    
  			    Point p = new Point(mu.get_m10()/mu.get_m00() , mu.get_m01()/mu.get_m00() );
  			    /* No difference
  			    camera.release();1
@@ -91,9 +87,11 @@ public class KitBotMain {
  			    
  			    System.out.println("Captured Frame Width " + frame.width());
  			    System.out.println("x" + p.x +"y:"  +p.y);
+ 			    //Tracking
  			    if(Double.isNaN(p.x)){ 
  			    	p.x = frame.width()/2;
  			    	p.y = frame.height()/2;
+ 			    	continue;
  			    }
  			    double rolMag = 0.5*((p.x - frame.width()/2 ) / frame.width());
  			    double camHeight = 0.1778;//m
@@ -112,7 +110,7 @@ public class KitBotMain {
  			    	break;
  			    }
  			    model.setMotors(forMag+rolMag, forMag -rolMag);
- 			    //view.repaint();
+ 			    view.repaint();
     		} catch ( Exception e ) {}
     	}
     }

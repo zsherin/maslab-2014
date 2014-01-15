@@ -12,7 +12,15 @@ public class KitBotView extends JPanel {
 	private JFrame window;
 	
 	public final Polygon left,forward,right,stop;
-	
+	/**
+	 * initializer
+	 * It draws out the view's GUI.  This view/JPanel is where methods can be attached on, but the
+	 * methods and functions are usually located in the controller.  Research Model-Controller-View Model.
+	 * 
+	 * @param width of the window
+	 * @param height of the window
+	 * @param window  The Jframe given.
+	 */
 	public KitBotView( int width, int height, JFrame window ) {
 		this.width = width;
 		this.height = height;
@@ -46,7 +54,9 @@ public class KitBotView extends JPanel {
 		
 		window.getContentPane().add(this);
 	}
-	
+	/**
+	 * paintComponent paints Component on the given Graphics g.
+	 */
 	public void paintComponent( Graphics g ) {
 		g.setColor( new Color(120,120,255) );
 		g.fillRect(0, 0, width, height);
@@ -59,7 +69,10 @@ public class KitBotView extends JPanel {
 		g.setColor( Color.RED);
 		g.fillPolygon(stop);
 	}
-	
+	/**
+	 * A fetch method for the window/JFrame that was passed on from the initializer.
+	 * @return JFrame window.
+	 */
 	public JFrame getwindow() {
 		return window;
 	}
