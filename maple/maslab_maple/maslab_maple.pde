@@ -346,22 +346,25 @@ void setup() {
   interrupts();
   //For Motor
   charCount = 0;
-  state = 0;
+  state = 0x00;
 }
 
 char buf[4];
 //sensory states
 int8 sNum = 0; //sonar number
-uint32 sTIme = micros(); //sonar time;
+uint32 sTime = micros(); //sonar time;
 
 void loop() {
   //Serial Communications
   if(SerialUSB.available()) {
     char ch = SerialUSB.read();
+    SerialUSB.print(ch);
+    SerialUSB.println(state);
     switch(state){
       case 0x00: //In Main
         if(ch == 'A') {//Motor Initializer
-          state == 0x01;
+          SerialUSB.println("ToMotor!");
+          state = 0x01;
           charCount=1;
           buf[0] = 'A';
         }
@@ -374,7 +377,6 @@ void loop() {
             motorL.set(buf[1]); 
             motorR.set(buf[2]);
           }
-          buf = buf[4];
           charCount = 0;
           state = 0x00;
         }
@@ -387,11 +389,12 @@ void loop() {
   
   //Sonar
   if(sTime-cTime > 20){
-    uint8 trigPin = sonars[sNum%7];
+    uint8 trigPin = sonars[sNum%7].trig;
     digitalWrite(trigPin,HIGH);
     delayMicroseconds(10);
     digitalWrite(trigPin,LOW);
     sNum++;
+    sTime = cTime;
   }
   
   //Gyro
