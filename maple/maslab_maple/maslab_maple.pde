@@ -83,34 +83,11 @@ public:
       SerialUSB.println(readBuf[3]);
     }
   }
+  double readData(){
+    return heading;
+  }
 };
-/*
-class Locator{
-  public:
-  int dx;
-  int dy;
-  int countR;
-  int countL;
-  Locator(){
-    dx =0;
-    dy =0;
-    countR;
-    countL;
-  }
-  void update(){
-    int r = motorR.readData();
-    int l = motorL.readData();
-    int travel = ((r - countR)+(l - countL))/2;
-    countR = r;
-    countL = l;
-    int heading = gryo.readData();
-    dx += travel*sin(heading);
-    dy += travel*cos(heading); 
-    
-  }
-}
 
-*
 //Motor w/Encoder Controller V1.0
 //TODO add PID for Motor w/ Encoder
 class MotorE{
@@ -226,6 +203,8 @@ public:
 
 //Main LOOP
 
+
+//Components
 Ultra ultra1 = Ultra(24,23);
 Ultra ultra2 = Ultra(26,25);
 Ultra ultra3 = Ultra(28,27);
@@ -237,34 +216,44 @@ Ultra sonars[] = {ultra1,ultra2,ultra3,ultra4,ultra5,ultra6,ultra7};
 FancyGyro gyro = FancyGyro();
 MotorE motorL = MotorE(4,3,2,18,17);
 MotorE motorR = MotorE(7,6,5,20,19);
-void ultra1ISR(){
-  ultra1.sample();
-}
-void ultra2ISR(){
-  ultra2.sample();
-}
-void ultra3ISR(){
-  ultra3.sample();
-}
-void ultra4ISR(){
-  ultra4.sample();
-}
-void ultra5ISR(){
-  ultra5.sample();
-}
-void ultra6ISR(){
-  ultra6.sample();
-}
-void ultra7ISR(){
-  ultra7.sample();
-}
 
-void motorLISR(){
-  motorL.sample();
-}
-void motorRISR(){
-  motorR.sample();
-}
+//Higher Class and Methods
+class Locator{
+  public:
+  int dx;
+  int dy;
+  int heading;
+  int countR;
+  int countL;
+  Locator(){
+    dx =0;
+    dy =0;
+    countR;
+    countL;
+  }
+  void update(){
+    int r = motorR.readData();
+    int l = motorL.readData();
+    int travel = ((r - countR)+(l - countL))/2;
+    countR = r;
+    countL = l;
+    heading = gyro.readData();
+    dx += travel*sin(heading);
+    dy += travel*cos(heading); 
+  }
+  
+};
+Locator loc = Locator();
+void ultra1ISR(){ ultra1.sample();}
+void ultra2ISR(){ ultra2.sample();}
+void ultra3ISR(){ ultra3.sample();}
+void ultra4ISR(){ ultra4.sample();}
+void ultra5ISR(){ ultra5.sample();}
+void ultra6ISR(){ ultra6.sample();}
+void ultra7ISR(){ ultra7.sample();}
+
+void motorLISR(){ motorL.sample();}
+void motorRISR(){ motorR.sample();}
 int charCount;
 byte state;
 void setup() {
@@ -288,11 +277,7 @@ char buf[4];
 //sensory states
 int8 sNum = 0; //sonar number
 uint32 sTime = micros(); //sonar time;
-void loop(){
-  gyro.sample();
-  delayMicroseconds(50);
-}
-/*
+uint32 gTime = micros();
 void loop() {
   //Serial Communications
   if(SerialUSB.available()) {
@@ -302,10 +287,23 @@ void loop() {
     switch(state){
       case 0x00: //In Main
         if(ch == 'A') {//Motor Initializer
-          SerialUSB.println("ToMotor!");
           state = 0x01;
           charCount=1;
           buf[0] = 'A';
+        }
+        else if(ch=='B'){//Locator Upload
+          buf[0] = (char)loc.heading;
+          buf[1] = (char)loc.dx;
+          buf[2] = (char)loc.dy;
+          loc.dx = 0;
+          loc.dy = 0;
+          SerialUSB.write(buf);
+        }
+        else if(ch=='C'){//Sonar Upload
+          for(int i =0; i<7; i++){
+            buf[i] = (char)sonars[i].readData();
+          }
+          SerialUSB.write(buf);
         }
         break;
       case 0x01: //In Motor
@@ -337,12 +335,14 @@ void loop() {
   }
   
   //Relative Localization.
-  
+  if(gTime-cTime > 30){
+    gyro.sample();
+    gTime = cTime;
+  }
   
   
   
   
 }
 
-*/
 
