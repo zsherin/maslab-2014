@@ -300,8 +300,6 @@ void loop() {
   //Serial Communications
   if(SerialUSB.available()) {
     char ch = SerialUSB.read();
-    SerialUSB.print(ch);
-    SerialUSB.println(state);
     switch(state){
       case 0x00: //In Main
         if(ch == 'A') {//Motor Initializer
@@ -310,13 +308,13 @@ void loop() {
           buf[0] = 'A';
         }
         else if(ch=='B'){//Locator Upload
-          SerialUSB.print((byte)loc.heading);
+          SerialUSB.print(loc.heading);
           SerialUSB.print(' ');
-          SerialUSB.print((byte)loc.dx);
+          SerialUSB.print(loc.dx);
           SerialUSB.print(' ');
-          SerialUSB.print((byte)loc.dy);
+          SerialUSB.print(loc.dy);
           SerialUSB.print(' ');
-          SerialUSB.print('e');
+          SerialUSB.println('e');
           loc.dx = 0;
           loc.dy = 0;
         }
@@ -357,20 +355,20 @@ void loop() {
   }
   
   //Relative Localization.
-  if(gTime-cTime > 1000){
+  if(gTime-cTime > 10){
     gyro.sample();
     gTime = cTime;
   }
   
-  if(lTime-cTime>100){
+  if(lTime-cTime>1000){
     loc.update();
     lTime = cTime;
-  }
+  }/*
   SerialUSB.print(loc.heading);  
   SerialUSB.print("||");
   SerialUSB.print(loc.dx);
   SerialUSB.print("||");
-  SerialUSB.println(loc.dy);
+  SerialUSB.println(loc.dy);*/
 }
 
 

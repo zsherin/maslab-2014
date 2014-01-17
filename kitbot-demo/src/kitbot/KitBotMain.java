@@ -72,7 +72,7 @@ public class KitBotMain {
     	KitBotController controller = new KitBotController(model,view);
     	
     	window.setSize(width,height);
-    	window.setVisible(true);
+    	window.setVisible(true);                                                                  
     	 System.out.println("Hello, OpenCV");
 		    // Load the native library.
 		    System.loadLibrary("opencv_java248");
@@ -108,11 +108,10 @@ public class KitBotMain {
     	long time = System.nanoTime();	  
     	while ( true ) {
     		try {
+    			
     			long duration = (System.nanoTime()- time)/(long)Math.pow(10.0,9.0);// In seconds
     			System.out.println("Current Fps:"+ 1.0/duration + "frame/Second.");
     			time = time + duration;
-
- 			    System.out.println("HI");
     			camera.read(frame);
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
@@ -140,8 +139,8 @@ public class KitBotMain {
 			   
 				updateWindow(opencvPane, frame);
  			    
- 			    System.out.println("Captured Frame Width " + frame.width());
- 			    System.out.println("x" + p.x +"y:"  +p.y);
+ 			    //System.out.println("Captured Frame Width " + frame.width());
+ 			    //System.out.println("x" + p.x +"y:"  +p.y);
  			    //Tracking
  			    if(Double.isNaN(p.x)){ 
  			    	p.x = frame.width()/2;
@@ -165,6 +164,7 @@ public class KitBotMain {
  			    	break;
  			    }
  			    model.setMotors(forMag+rolMag, forMag -rolMag);
+ 			    model.updatePos();
  			    view.repaint();
     		} catch ( Exception e ) {}
     	}

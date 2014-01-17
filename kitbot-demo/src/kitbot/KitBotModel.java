@@ -22,7 +22,7 @@ public class KitBotModel {
      */
 	public KitBotModel() {
 		try {
-			serialPort = new SerialPort("COM3");//Will attempt to read the first port found.
+			serialPort = new SerialPort("COM5");//Will attempt to read the first port found.
             serialPort.openPort();
             serialPort.setParams(115200, 8, 1, 0);
         }
@@ -92,20 +92,20 @@ public class KitBotModel {
 	 * updatePos gets positional updates from the microcontroller
 	 * @return byte[] :  Heading, change in x, change in y.
 	 */
-	public byte[] updatePos(){
-		byte data[] = new byte[3];
+	public String updatePos(){
+		String s = " ";
 		try{
 			serialPort.writeByte((byte)'B');
-			data = serialPort.readBytes(3);
+			s = serialPort.readString();
+			String data[] = s.split(" ");
 			serialPort.writeByte((byte)'E');
-			heading = data[0];
-			x += data[1];
-			y += data[2];
-			System.out.println("Got Pos Data:" + data);
+			heading = Double.parseDouble(data[0]);
+			x +=  Double.parseDouble(data[1]);;
+			y +=  Double.parseDouble(data[2]);;
 		}catch(Exception ex){
 		}
-		return data;
-	}
+		return s;
+	}    
 	/**
 	 * finalize closes the Serial Communication.
 	 * This is used to stop the robot from functions.
