@@ -104,11 +104,23 @@ public class KitBotMain {
 			 height = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT));
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 
-
-    	long time = System.nanoTime();	  
+	    //Move 0.5 Meter forward
+		while(true){
+			model.updatePos();
+			if(Math.abs(model.heading)> 0.1){
+				model.setMotors(0.5*model.heading, -0.5*model.heading);
+			}else{
+				model.setMotors(0.1,0.1);
+				if(model.y>0.5){
+					model.setMotors(0,0);
+					break;
+				}
+			}
+		}
+        //Chase Ball
+    	long time = System.nanoTime();
     	while ( true ) {
     		try {
-    			
     			long duration = (System.nanoTime()- time)/(long)Math.pow(10.0,9.0);// In seconds
     			System.out.println("Current Fps:"+ 1.0/duration + "frame/Second.");
     			time = time + duration;

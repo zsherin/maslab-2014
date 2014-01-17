@@ -8,9 +8,9 @@ public class KitBotModel {
 	private SerialPort serialPort;
     private byte motorA = 0;
     private byte motorB = 0;
-    private double x = 0;
-    private double y = 0;
-    private double heading = 0;
+    public double x = 0;
+    public double y = 0;
+    public double heading = 0;
     private byte sonar[] = new byte[7];
     /**
      * Initializer
