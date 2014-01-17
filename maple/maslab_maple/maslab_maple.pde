@@ -1,4 +1,3 @@
-#include <Wire.h>
 
 /*
 MAPLE Microcontroller Code in Processing
@@ -32,113 +31,7 @@ Object.readData:  for the main loop to grab the data.
 Actuator.set:  to set the actuator in a specific state{Motor: voltage}
 */
 
-
-// Acc Reader V1.0
-//I2C addresses
-byte GyroL3 = 0x69; //L3G4200D Gyro
-byte AccAD = 0x53;  //ADXL345 Accelerometer
-byte ComMC = 0x1E;  //HMC5883L Magnetic Compass
-byte BaroBM = 0x77; //BMP085 Barometer + Thermometer
-class Acc{
-  //Acc scale = 8/1024 (8G) = 0.0078
-  public:
-  double dxt;
-  double dyt;
-  double heading;
-  long AccTime;
-  long GyroTime;
-  Acc(){
-    dxt = 0;
-    dyt = 0;
-    heading = 0;
-    Wire.begin();
-    //Begin I2C Testing.
-    Wire.beginTransmission(AccAD);
-    Wire.send(0x00);
-    if(Wire.receive()!=0xE5){
-      SerialUSB.println("Error ADSL345 Accelerometer: Not recognized in I2C.  Incorrect ID received.");
-    }
-    Wire.endTransmission();
-    
-    Wire.beginTransmission(GyroL3);
-    Wire.send(0x0F);
-    if(Wire.receive()!=0xD3){
-      SerialUSB.println("Error L3G4200D Gyro: Not recognized in I2C.  Incorrect ID received.");
-    }
-    Wire.endTransmission();
-    //TODO4 add check to MC and BMP
-    AccTime = micros();
-    GyroTime = micros();
-  }
-  
-  void ComSample(){
-    Wire.beginTransmission(ComMC);
-    //X
-    double x = 0;
-    Wire.send(0x05);
-    x += Wire.receive();
-    Wire.send(0x06);;
-    x = Wire.receive() + x*1024;
-    double y = 0;
-    Wire.send(0x07);
-    y += Wire.receive();
-    Wire.send(0x08);;
-    y = Wire.receive() + y*1024;
-    heading += 0.95*heading + 0.05*atan((float)x/y);
-    Wire.endTransmission();
-  }
-  void GyroSample(){
-    long Time = micros();
-    long dt = Time - GyroTime;
-    Wire.beginTransmission(GyroL3);
-    uint8 out[] ={};
-    Wire.send(0x2C);
-    delay(1);
-    out[0] = Wire.receive();
-    Wire.send(0x2D);
-    delay(1);
-    out[1] =  Wire.receive();
-    long ddz = out[0]*1024 + out[1];
-    heading += ddz*(2*PI/365)*Time;
-    Wire.endTransmission();
-  }
-  void AccSample(){
-    long Time = micros();
-    long dt = Time - AccTime;
-    Wire.beginTransmission(AccAD);
-    uint8 out[] = {};
-    //begin reading from X axis.
-    Wire.send(0x32);
-    delay(1);
-    out[0] =  Wire.receive();
-    Wire.send(0x33);
-    delay(1);
-    out[1] = Wire.receive();
-    double ddx = out[0]*1024 + out[1];
-    dxt += ddx*dt*dt;
-    //Y
-    Wire.send(0x34);
-    delay(1);
-    out[2] = Wire.receive();
-    Wire.send(0x35);
-    delay(1);
-    out[3] = Wire.receive();
-    double ddy = out[2]*1024 + out[3];
-    dyt += ddy*dt*dt;
-    
-    //Z
-    Wire.send(0x36);
-    delay(1);
-    out[4] = Wire.receive();
-    Wire.send(0x37);
-    delay(1);
-    out[5] = Wire.receive();
-    AccTime = Time;
-  }
-  double readData(){
-    return dxt;//TODO return 
-  }
-};
+//Robot Model.
 
 
 
@@ -146,14 +39,10 @@ class Acc{
 HardwareSPI spi(1);
 class FancyGyro{
 public:
-  double dx;
-  double dy;
   double heading;
   uint8 writeBuf[4];
   uint8 readBuf[4];
   FancyGyro(){
-    dx =0;
-    dy = 0;
     heading =0;
     pinMode(9, OUTPUT);
     digitalWrite(9, HIGH);
@@ -309,8 +198,8 @@ Ultra ultra6 = Ultra(34,33);
 Ultra ultra7 = Ultra(36,35);
 Ultra sonars[] = {ultra1,ultra2,ultra3,ultra4,ultra5,ultra6,ultra7};
 FancyGyro gyro = FancyGyro();
-Motor motorL = Motor(4,3,2);
-Motor motorR = Motor(7,6,5);
+Motor motorL = Motor(4,3,2,18,17);
+Motor motorR = Motor(7,6,5,20,19);
 void ultra1ISR(){
   ultra1.sample();
 }
@@ -353,7 +242,12 @@ char buf[4];
 //sensory states
 int8 sNum = 0; //sonar number
 uint32 sTime = micros(); //sonar time;
-
+void loop(){
+  SerialUSB.print(motorL.readData());
+  SerialUSB.print("||");
+  SerialUSB.println(motorR.readData());
+}
+/*
 void loop() {
   //Serial Communications
   if(SerialUSB.available()) {
@@ -408,5 +302,5 @@ void loop() {
   
 }
 
-
+*/
 

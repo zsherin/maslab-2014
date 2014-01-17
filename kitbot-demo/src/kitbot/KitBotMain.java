@@ -77,7 +77,7 @@ public class KitBotMain {
 		    // Load the native library.
 		    System.loadLibrary("opencv_java248");
 		    VideoCapture camera = new VideoCapture(1);
-		    camera.open(1); //Not Useless, actually
+		    camera.open(1); //Not Useless, actually //AC- Yay!
 		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
 		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,720);
 		    System.out.println(hset);
