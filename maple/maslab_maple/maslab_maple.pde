@@ -43,22 +43,24 @@ public:
   uint8 writeBuf[4];
   uint8 readBuf[4];
   uint32 lTime;
+  float zeroError;
   FancyGyro(){
     heading =0;
     pinMode(9, OUTPUT);
     digitalWrite(9, HIGH);
     spi.begin(SPI_4_5MHZ, MSBFIRST, SPI_MODE_0);
+    delay(5);
+    zeroError = talkToGyro();
     uint32 lTIme = micros();
   }
-  // TODO3 Understand Gyro output and oop data.
-  void sample(){
+  float talkToGyro(){
     writeBuf[0] = 0x20;
     writeBuf[1] = 0x00;
     writeBuf[2] = 0x00;
     writeBuf[3] = 0x00;
     digitalWrite(9, LOW);
     for(int i =0; i<4; i++){  
-        delayMicroseconds(2);
+        delay(1);
         readBuf[i] = spi.transfer(writeBuf[i]);
     }
     digitalWrite(9, HIGH);
@@ -70,9 +72,7 @@ public:
       unsignedData += (temp1 << 6);
       unsignedData += (temp0 << 14);
       int16 signedData = (int16) unsignedData;
-      uint32 time = micros();
-      heading += ((float)signedData)*(time-lTime)*0.000218166156/100000; //rad/s
-      lTime=time;
+      return (float)signedData;
     } 
     else {
       SerialUSB.print("SensorSetupFail:");
@@ -81,6 +81,16 @@ public:
       SerialUSB.print(readBuf[2]);
       SerialUSB.println(readBuf[3]);
     }
+  }
+  // TODO3 Understand Gyro output and oop data.
+  void sample(){
+    uint32 time = micros();
+    if(abs((talkToGyro()-zeroError)*0.000218166156) <0.5 ){
+      lTime = time;
+      return;
+    }
+    heading += (talkToGyro()-zeroError)*0.000218166156*(time-lTime)/1000000; //rad/s
+    lTime=time;
   }
   double readData(){
     while (heading > 2*PI){
@@ -230,8 +240,8 @@ class Locator{
   double dx;
   double dy;
   double heading;
-  int countR;
-  int countL;
+  double countR;
+  double countL;
   Locator(){
     dx =0;
     dy =0;
@@ -239,13 +249,13 @@ class Locator{
     countL;
   }
   void update(){
-    int r = motorR.readData();
-    int l = motorL.readData();
-    int travel = ((r - countR)+(l - countL))/2;
+    double r = motorR.readData();
+    double l = motorL.readData();
+    double travel = ((r - countR)+(l - countL))/2;
     countR = r;
     countL = l;
     heading = gyro.readData();
-     dx += travel*sin(heading);
+    dx += travel*sin(heading);
     dy += travel*cos(heading); 
   }
   
@@ -285,6 +295,7 @@ char buf[4];
 int8 sNum = 0; //sonar number
 uint32 sTime = micros(); //sonar time;
 uint32 gTime = micros();
+uint32 lTime = micros();
 void loop() {
   //Serial Communications
   if(SerialUSB.available()) {
@@ -346,19 +357,20 @@ void loop() {
   }
   
   //Relative Localization.
-  if(gTime-cTime > 30){
+  if(gTime-cTime > 1000){
     gyro.sample();
     gTime = cTime;
   }
   
   if(lTime-cTime>100){
     loc.update();
+    lTime = cTime;
   }
   SerialUSB.print(loc.heading);  
   SerialUSB.print("||");
-  SerialUSB.print(loc.dx);'
+  SerialUSB.print(loc.dx);
   SerialUSB.print("||");
-  SerialUSB.println(loc.dy);'
+  SerialUSB.println(loc.dy);
 }
 
 
