@@ -83,6 +83,12 @@ public:
     }
   }
   double readData(){
+    while (heading > 2*PI){
+      heading -= 2*PI;
+    }
+    while (heading <-2*PI){
+      heading += 2*PI;
+    }
     return heading;
   }
 };
@@ -115,6 +121,7 @@ class MotorE{
     digitalWrite(gndPin,LOW);
     encoder = true;
     count =0;
+    set(0);
   }
   void sample() {
     if ( digitalRead(encoder2Pin)==HIGH )
@@ -130,8 +137,8 @@ class MotorE{
   }
   void update(){
   }
-  int readData(){
-    count * 0.0166601;//in cm
+  double readData(){
+    return (double)count * 0.0166601;//in cm
   }
 };
 
@@ -187,7 +194,7 @@ public:
       start = micros();
     } 
     else {
-      endx = micros();      
+      endx = micros();
       //25% EWMA filter
       float diff =  (endx - start);
       data = (uint8)(0.95*data + 0.05*diff);
@@ -219,9 +226,9 @@ MotorE motorR = MotorE(7,6,5,20,19);
 //Higher Class and Methods
 class Locator{
   public:
-  int dx;
-  int dy;
-  int heading;
+  double dx;
+  double dy;
+  double heading;
   int countR;
   int countL;
   Locator(){
@@ -237,7 +244,7 @@ class Locator{
     countR = r;
     countL = l;
     heading = gyro.readData();
-    dx += travel*sin(heading);
+     dx += travel*sin(heading);
     dy += travel*cos(heading); 
   }
   
@@ -306,7 +313,7 @@ void loop() {
             SerialUSB.print((byte)sonars[i].readData());
             SerialUSB.print(' ');
           }
-          SerialUSB.print('e');
+            SerialUSB.print(' ');
         }
         break;
       case 0x01: //In Motor
