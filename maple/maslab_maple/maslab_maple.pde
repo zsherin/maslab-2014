@@ -302,7 +302,7 @@ public:
 
 Ultra ultra1 = Ultra(24,23);
 Ultra ultra2 = Ultra(26,25);
-Ultra ultra3 = Ultra(28,27);//Need to be Changed
+Ultra ultra3 = Ultra(28,27);
 Ultra ultra4 = Ultra(30,29);
 Ultra ultra5 = Ultra(32,31);
 Ultra ultra6 = Ultra(34,33);
