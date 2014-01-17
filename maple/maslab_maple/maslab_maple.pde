@@ -257,7 +257,7 @@ char buf[4];
 int8 sNum = 0; //sonar number
 uint32 sTime = micros(); //sonar time;
 void loop(){
-  SerialUSB.println(motorR.sample());
+  gyro.sample();
   delayMicroseconds(50);
 }
 /*
