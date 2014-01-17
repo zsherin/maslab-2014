@@ -225,7 +225,7 @@ void ultra7ISR(){
 void motorLISR(){
   motorL.sample();
 }
-void motorRISTR(){
+void motorRISR(){
   motorR.sample();
 }
 int charCount;
