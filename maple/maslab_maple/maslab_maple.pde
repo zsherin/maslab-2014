@@ -291,11 +291,11 @@ void loop() {
           buf[0] = 'A';
         }
         else if(ch=='B'){//Locator Upload
-          SerialUSB.print((char)loc.heading);
+          SerialUSB.print((byte)loc.heading);
           SerialUSB.print(' ');
-          SerialUSB.print((char)loc.dx);
+          SerialUSB.print((byte)loc.dx);
           SerialUSB.print(' ');
-          SerialUSB.print((char)loc.dy);
+          SerialUSB.print((byte)loc.dy);
           SerialUSB.print(' ');
           SerialUSB.print('e');
           loc.dx = 0;
@@ -303,7 +303,7 @@ void loop() {
         }
         else if(ch=='C'){//Sonar Upload
           for(int i =0; i<5; i++){
-            SerialUSB.print((char)sonars[i].readData());
+            SerialUSB.print((byte)sonars[i].readData());
             SerialUSB.print(' ');
           }
           SerialUSB.print('e');
