@@ -138,6 +138,7 @@ class MotorE{
   void update(){
   }
   double readData(){
+   // SerialUSB.println((double)count * 0.0166601);
     return (double)count * 0.0166601;//in cm
   }
 };
@@ -345,12 +346,12 @@ void loop() {
   }
   
   //Relative Localization.
-  if(gTime-cTime > 30){
-    gyro.sample();
+  if(gTime-cTime > 50){
+    loc.update();
     gTime = cTime;
   }
   
-  
+  gyro.sample();
   
   
 }
