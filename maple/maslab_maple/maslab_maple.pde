@@ -48,7 +48,7 @@ public:
     pinMode(9, OUTPUT);
     digitalWrite(9, HIGH);
     spi.begin(SPI_4_5MHZ, MSBFIRST, SPI_MODE_0);
-    lTIme = micros();
+    uint32 lTIme = micros();
   }
   // TODO3 Understand Gyro output and oop data.
   void sample(){
@@ -84,7 +84,7 @@ public:
     }
   }
 };
-
+/*
 class Locator{
   public:
   int dx;
@@ -110,7 +110,7 @@ class Locator{
   }
 }
 
-
+*
 //Motor w/Encoder Controller V1.0
 //TODO add PID for Motor w/ Encoder
 class MotorE{
