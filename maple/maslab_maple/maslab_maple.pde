@@ -42,11 +42,13 @@ public:
   double heading;
   uint8 writeBuf[4];
   uint8 readBuf[4];
+  uint32 lTime;
   FancyGyro(){
     heading =0;
     pinMode(9, OUTPUT);
     digitalWrite(9, HIGH);
     spi.begin(SPI_4_5MHZ, MSBFIRST, SPI_MODE_0);
+    lTIme = micros();
   }
   // TODO3 Understand Gyro output and oop data.
   void sample(){
@@ -68,16 +70,43 @@ public:
       unsignedData += (temp1 << 6);
       unsignedData += (temp0 << 14);
       int16 signedData = (int16) unsignedData;
-      SerialUSB.println(signedData);
+      uint32 time = micros();
+      heading += ((float)signedData)*(time-lTime)*0.000218166156/100000; //rad/s
+      lTime=time;
+      SerialUSB.println(heading);
     } 
     else {
-      SerialUSB.println("SensorSetupFail.");
+      SerialUSB.println(readBuf);
       // not sensor data; could be a R/W error message
       // TODO2 add gyro Misconfig Error
     }
   }
 };
 
+class Locator{
+  public:
+  int dx;
+  int dy;
+  int countR;
+  int countL;
+  Locator(){
+    dx =0;
+    dy =0;
+    countR;
+    countL;
+  }
+  void update(){
+    int r = motorR.readData();
+    int l = motorL.readData();
+    int travel = ((r - countR)+(l - countL))/2;
+    countR = r;
+    countL = l;
+    int heading = gryo.readData();
+    dx += travel*sin(heading);
+    dy += travel*cos(heading); 
+    
+  }
+}
 
 
 //Motor w/Encoder Controller V1.0
@@ -90,7 +119,7 @@ class MotorE{
   uint8 encoder1Pin;
   uint8 encoder2Pin;
   boolean encoder;
-  volatile unsigned int count;
+  volatile int count;
 /*  int8 ddir; //desired dir
   int8 cdir; //current dir
   //PID controls
@@ -135,7 +164,6 @@ public:
   uint8 pwmPin;
   uint8 dirPin;
   uint8 gndPin;
-  volatile unsigned int count;
   
   Motor(uint8 _gndPin, uint8 _pwmPin, uint8 _dirPin) : 
   gndPin(_gndPin), pwmPin(_pwmPin), dirPin(_dirPin){
