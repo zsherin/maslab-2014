@@ -346,14 +346,19 @@ void loop() {
   }
   
   //Relative Localization.
-  if(gTime-cTime > 50){
-    loc.update();
+  if(gTime-cTime > 30){
+    gyro.sample();
     gTime = cTime;
   }
   
-  gyro.sample();
-  
-  
+  if(lTime-cTime>100){
+    loc.update();
+  }
+  SerialUSB.print(loc.heading);  
+  SerialUSB.print("||");
+  SerialUSB.print(loc.dx);'
+  SerialUSB.print("||");
+  SerialUSB.println(loc.dy);'
 }
 
 
