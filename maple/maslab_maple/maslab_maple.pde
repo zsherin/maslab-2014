@@ -221,6 +221,13 @@ void ultra6ISR(){
 void ultra7ISR(){
   ultra7.sample();
 }
+
+void motorLISR(){
+  motorL.sample();
+}
+void motorRISTR(){
+  motorR.sample();
+}
 int charCount;
 byte state;
 void setup() {
@@ -232,6 +239,8 @@ void setup() {
   attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
   attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
   attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
+  attachInterrupt(motorL.encoder1Pin,motorLISR,RISING);
+  attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
   interrupts();
   //For Motor
   charCount = 0;
