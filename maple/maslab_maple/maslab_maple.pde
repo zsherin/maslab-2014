@@ -55,9 +55,10 @@ public:
     writeBuf[2] = 0x00;
     writeBuf[3] = 0x00;
     digitalWrite(9, LOW);
-    delayMicroseconds(2);
-    spi.write(writeBuf,4);
-    spi.read(readBuf,4);
+    for(int i =0; i<4; i++){  
+        delayMicroseconds(2);
+        readBuf[i] = spi.transfer(writeBuf[i]);
+    }
     digitalWrite(9, HIGH);
     uint8 test = readBuf[0] & 0b00001100;
     if (test == 0b00000100) {
@@ -70,6 +71,7 @@ public:
       SerialUSB.println(signedData);
     } 
     else {
+      SerialUSB.println("SensorSetupFail.");
       // not sensor data; could be a R/W error message
       // TODO2 add gyro Misconfig Error
     }
