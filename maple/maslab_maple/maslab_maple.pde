@@ -73,7 +73,6 @@ public:
       uint32 time = micros();
       heading += ((float)signedData)*(time-lTime)*0.000218166156/100000; //rad/s
       lTime=time;
-      SerialUSB.println(heading);
     } 
     else {
       SerialUSB.print("SensorSetupFail:");
@@ -292,7 +291,7 @@ void loop() {
           buf[0] = 'A';
         }
         else if(ch=='B'){//Locator Upload
-          buf[0] = (char)loc.heading;
+          SerialUSB.print((char)loc.heading);
           buf[1] = (char)loc.dx;
           buf[2] = (char)loc.dy;
           loc.dx = 0;
