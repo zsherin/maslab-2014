@@ -81,11 +81,10 @@ public class KitBotModel {
 	public byte[] updateSonar(){
 		try{
 			serialPort.writeByte((byte)'C');
-			sonar = serialPort.readBytes(7);
+			sonar = serialPort.readBytes(5);
 			serialPort.writeByte((byte)'E');
 			System.out.println("Got Sonar Data:" + sonar);
 		}catch (Exception ex){
-			
 		}
 		return sonar;
 	}
@@ -104,7 +103,6 @@ public class KitBotModel {
 			y += data[2];
 			System.out.println("Got Pos Data:" + data);
 		}catch(Exception ex){
-			
 		}
 		return data;
 	}

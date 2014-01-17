@@ -204,14 +204,14 @@ public:
 
 
 //Components
-Ultra ultra1 = Ultra(24,23);
+Ultra ultra1 = Ultra(23,24);
 Ultra ultra2 = Ultra(26,25);
-Ultra ultra3 = Ultra(28,27);
+//Ultra ultra3 = Ultra(28,27);
 Ultra ultra4 = Ultra(30,29);
 Ultra ultra5 = Ultra(32,31);
 Ultra ultra6 = Ultra(34,33);
-Ultra ultra7 = Ultra(36,35);
-Ultra sonars[] = {ultra1,ultra2,ultra3,ultra4,ultra5,ultra6,ultra7};
+//Ultra ultra7 = Ultra(36,35);
+Ultra sonars[] = {ultra1,ultra2,ultra4,ultra5,ultra6};
 FancyGyro gyro = FancyGyro();
 MotorE motorL = MotorE(4,3,2,18,17);
 MotorE motorR = MotorE(7,6,5,20,19);
@@ -245,11 +245,11 @@ class Locator{
 Locator loc = Locator();
 void ultra1ISR(){ ultra1.sample();}
 void ultra2ISR(){ ultra2.sample();}
-void ultra3ISR(){ ultra3.sample();}
+//void ultra3ISR(){ ultra3.sample();}
 void ultra4ISR(){ ultra4.sample();}
 void ultra5ISR(){ ultra5.sample();}
 void ultra6ISR(){ ultra6.sample();}
-void ultra7ISR(){ ultra7.sample();}
+//void ultra7ISR(){ ultra7.sample();}
 
 void motorLISR(){ motorL.sample();}
 void motorRISR(){ motorR.sample();}
@@ -259,11 +259,11 @@ void setup() {
   noInterrupts();
   attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
   attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
-  attachInterrupt(ultra3.echo, ultra3ISR, CHANGE);
+//  attachInterrupt(ultra3.echo, ultra3ISR, CHANGE);
   attachInterrupt(ultra4.echo, ultra4ISR, CHANGE);
   attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
   attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
-  attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
+//  attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
   attachInterrupt(motorL.encoder1Pin,motorLISR,RISING);
   attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
   interrupts();
@@ -292,17 +292,21 @@ void loop() {
         }
         else if(ch=='B'){//Locator Upload
           SerialUSB.print((char)loc.heading);
-          buf[1] = (char)loc.dx;
-          buf[2] = (char)loc.dy;
+          SerialUSB.print(' ');
+          SerialUSB.print((char)loc.dx);
+          SerialUSB.print(' ');
+          SerialUSB.print((char)loc.dy);
+          SerialUSB.print(' ');
+          SerialUSB.print('e');
           loc.dx = 0;
           loc.dy = 0;
-          SerialUSB.write(buf);
         }
         else if(ch=='C'){//Sonar Upload
-          for(int i =0; i<7; i++){
-            buf[i] = (char)sonars[i].readData();
+          for(int i =0; i<5; i++){
+            SerialUSB.print((char)sonars[i].readData());
+            SerialUSB.print(' ');
           }
-          SerialUSB.write(buf);
+          SerialUSB.print('e');
         }
         break;
       case 0x01: //In Motor
