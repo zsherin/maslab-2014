@@ -71,7 +71,11 @@ public:
       SerialUSB.println(signedData);
     } 
     else {
-      SerialUSB.println("SensorSetupFail.");
+      SerialUSB.print("SensorSetupFail:");
+      SerialUSB.print(readBuf[0]);
+      SerialUSB.print(readBuf[1]);
+      SerialUSB.print(readBuf[2]);
+      SerialUSB.println(readBuf[3]);
       // not sensor data; could be a R/W error message
       // TODO2 add gyro Misconfig Error
     }
