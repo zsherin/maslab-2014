@@ -54,24 +54,11 @@ public:
     writeBuf[1] = 0x00;
     writeBuf[2] = 0x00;
     writeBuf[3] = 0x00;
-
     digitalWrite(9, LOW);
-    delay(1);
-
-    readBuf[0] = spi.transfer(writeBuf[0]);
-    delay(1);
-    //SerialUSB.println(readBuf[0]);
-    readBuf[1] = spi.transfer(writeBuf[1]);
-    delay(1);
-    //SerialUSB.println(readBuf[1]);
-    readBuf[2] = spi.transfer(writeBuf[2]);
-    delay(1);
-    //SerialUSB.println(readBuf[2]);
-    readBuf[3] = spi.transfer(writeBuf[3]);
-    delay(1);
-    //SerialUSB.println(readBuf[3]);
+    delayMicroseconds(2);
+    spi.write(writeBuf,4);
+    spi.read(readBuf,4);
     digitalWrite(9, HIGH);
-
     uint8 test = readBuf[0] & 0b00001100;
     if (test == 0b00000100) {
       uint16 temp0 = (uint16) readBuf[0];
@@ -91,10 +78,10 @@ public:
 
 
 
-// Motor Controller V1.0
-class Motor {
-  //Motor Control
-public:
+//Motor w/Encoder Controller V1.0
+//TODO add PID for Motor w/ Encoder
+class MotorE{
+  public:
   uint8 pwmPin;
   uint8 dirPin;
   uint8 gndPin;
@@ -102,8 +89,14 @@ public:
   uint8 encoder2Pin;
   boolean encoder;
   volatile unsigned int count;
-  
-  Motor(uint8 _gndPin, uint8 _pwmPin, uint8 _dirPin, uint8 _encoder1Pin, uint8 _encoder2Pin) : 
+/*  int8 ddir; //desired dir
+  int8 cdir; //current dir
+  //PID controls
+  int32 eInt; // Integral sum of the last few times.
+  int8  eDx; //Previous value
+  int32 ltime; //Last time PID updated.
+  */
+  MotorE(uint8 _gndPin, uint8 _pwmPin, uint8 _dirPin, uint8 _encoder1Pin, uint8 _encoder2Pin) : 
   gndPin(_gndPin), pwmPin(_pwmPin), dirPin(_dirPin), encoder1Pin(_encoder1Pin), encoder2Pin(_encoder2Pin){
     pinMode(gndPin, OUTPUT);
     pinMode(pwmPin, PWM );
@@ -112,9 +105,7 @@ public:
     pinMode(encoder2Pin, INPUT);
     digitalWrite(gndPin,LOW);
     encoder = true;
-    int8 dir = 0;
     count =0;
-    set(dir);
   }
   void sample() {
     if ( digitalRead(encoder2Pin)==HIGH )
@@ -122,31 +113,45 @@ public:
     else
       count--;
   }
+  void set(int8 dir){
+    uint16 dirMag = dir > 0 ? dir : -dir;
+    uint16 pwm = (dirMag == 128) ? 65535 : dirMag << 9;
+    digitalWrite(dirPin,(dir>0));//TODO1 Critical Assumption:  Byte division behavior need to be checked.
+    pwmWrite(pwmPin,pwm);
+  }
+  void update(){
+  }
+  int readData(){
+    count * 0.0166601;//in cm
+  }
+};
+
+// Motor Controller V1.0
+class Motor {
+  //Motor Control
+public:
+  uint8 pwmPin;
+  uint8 dirPin;
+  uint8 gndPin;
+  volatile unsigned int count;
+  
   Motor(uint8 _gndPin, uint8 _pwmPin, uint8 _dirPin) : 
   gndPin(_gndPin), pwmPin(_pwmPin), dirPin(_dirPin){
     pinMode(gndPin, OUTPUT);
     pinMode(pwmPin, PWM);
     pinMode(dirPin, OUTPUT);
     digitalWrite(gndPin,LOW);
-    encoder = false;
     int8 dir = 0;
     set(dir);
   }
   void set(int8 dir){
     uint16 dirMag = dir > 0 ? dir : -dir;
     uint16 pwm = (dirMag == 128) ? 65535 : dirMag << 9;
-    SerialUSB.print(pwmPin);
-    SerialUSB.print("||");
-    SerialUSB.println(dir);
     digitalWrite(dirPin,(dir>0));//TODO1 Critical Assumption:  Byte division behavior need to be checked.
     pwmWrite(pwmPin,pwm);
   }
   int readData(){
-    if (encoder)
-      return count;
-    else
       return 0;
-    
   }
 };
 
@@ -176,12 +181,12 @@ public:
     else {
       endx = micros();      
       //25% EWMA filter
-      float diff =  (endx - start)*0.034029;//in cm
+      float diff =  (endx - start);
       data = (uint8)(0.95*data + 0.05*diff);
     }
   }
   byte readData(){
-    return data;
+    return data*0.034029;//in cm
   }
 };
 
@@ -198,8 +203,8 @@ Ultra ultra6 = Ultra(34,33);
 Ultra ultra7 = Ultra(36,35);
 Ultra sonars[] = {ultra1,ultra2,ultra3,ultra4,ultra5,ultra6,ultra7};
 FancyGyro gyro = FancyGyro();
-Motor motorL = Motor(4,3,2,18,17);
-Motor motorR = Motor(7,6,5,20,19);
+MotorE motorL = MotorE(4,3,2,18,17);
+MotorE motorR = MotorE(7,6,5,20,19);
 void ultra1ISR(){
   ultra1.sample();
 }
@@ -252,9 +257,8 @@ char buf[4];
 int8 sNum = 0; //sonar number
 uint32 sTime = micros(); //sonar time;
 void loop(){
-  SerialUSB.print(motorL.readData());
-  SerialUSB.print("||");
-  SerialUSB.println(motorR.readData());
+  SerialUSB.println(motorR.sample());
+  delayMicroseconds(50);
 }
 /*
 void loop() {
@@ -300,10 +304,7 @@ void loop() {
     sTime = cTime;
   }
   
-  //Gyro
-  
-  
-  //Acc
+  //Relative Localization.
   
   
   
