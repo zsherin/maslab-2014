@@ -114,13 +114,11 @@ public class BotClientMap {
 		public final WallType type;
 		public final Point start;
 		public final Point end;
-		
 		public Wall(Point start, Point end, WallType type) {
 			this.start = start;
 			this.end = end;
 			this.type = type;
 		}
-		
 
 		@Override
 		public String toString() {

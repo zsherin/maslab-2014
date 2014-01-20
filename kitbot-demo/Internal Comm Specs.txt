@@ -18,6 +18,11 @@ Laptop >> "C" >> Micro //initiator
 Micro >> {1...9} "e" >> Laptop //Smoothed Sensor Data
 Laptop >> "E" >> Micro //Ack
 
+<<Kill Code>>
+//No Ack needed.
+Laptop >> "D" >> Micro //Kill Code
+
+
 
 
 

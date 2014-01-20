@@ -325,6 +325,13 @@ void loop() {
           }
             SerialUSB.print(' ');
         }
+        else if(ch =='D'){
+          motorL.set(0);
+          motorR.set(0);
+          while(true){
+            
+          }
+        }
         break;
       case 0x01: //In Motor
         buf[charCount % 4] = ch;

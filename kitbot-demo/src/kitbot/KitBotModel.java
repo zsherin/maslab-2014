@@ -105,7 +105,7 @@ public class KitBotModel {
 		}catch(Exception ex){
 		}
 		return s;
-	}    
+	}
 	/**
 	 * finalize closes the Serial Communication.
 	 * This is used to stop the robot from functions.
@@ -115,6 +115,7 @@ public class KitBotModel {
 	 */
 	public void finalize() {
 		try {
+			serialPort.writeByte((byte)'D');//Kill Code.
 			serialPort.closePort();
 		} catch ( Exception ex ) {
 			System.out.println(ex);
