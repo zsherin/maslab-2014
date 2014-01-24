@@ -1,5 +1,5 @@
   
-
+boolean turning;
 class Motor{
   private:
   double power;
@@ -25,6 +25,8 @@ class Motor{
       digitalWrite(InAPin, LOW);
       digitalWrite(InBPin, HIGH);
     }
+    
+    analogWrite(PWMPin,abs(power));
   }
 }
 Motor mL;
@@ -40,5 +42,21 @@ void setup(){
 void loop(){
   int sL = analogRead(A1);
   int sR = analogRead(A2);
+  
+  if(sL < 500 && sR < 500)
+  {
+    mL.set(125);
+    mR.set(125);
+  }
+  else
+  {
+    mL.set(125);
+    mR.set(-125);
+    delay(1000);
+    mL.set(0);
+    mR.set(0);
+  }
+  
+  
   
 }
