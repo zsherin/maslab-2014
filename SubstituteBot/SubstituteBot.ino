@@ -30,8 +30,8 @@ class Motor{
 Motor mL;
 Motor mR;
 void setup(){
-  mL = Motor();
-  mR = Motor();
+  mL = Motor(2,4,3);
+  mR = Motor(6,7,5);
   //IR
   pinMode(A1, INPUT);
   pinMode(A2, INPUT);
