@@ -28,31 +28,28 @@ class Motor{
     
     analogWrite(PWMPin,abs(power));
   }
-}
-Motor mL;
-Motor mR;
+};
+Motor mL = Motor(6,7,5);
+Motor mR = Motor(2,4,3);
 void setup(){
-  mL = Motor(2,4,3);
-  mR = Motor(6,7,5);
   //IR
   pinMode(A1, INPUT);
-  pinMode(A2, INPUT);
+  pinMode(A0, INPUT);
 }
 
 void loop(){
-  int sL = analogRead(A1);
-  int sR = analogRead(A2);
+  int dist = analogRead(A1) + analogRead(A0);
   
-  if(sL < 500 && sR < 500)
+  if(dist < 1200)
   {
-    mL.set(125);
-    mR.set(125);
+    mL.set(210);
+    mR.set(210);
   }
   else
   {
-    mL.set(125);
-    mR.set(-125);
-    delay(1000);
+    mL.set(210);
+    mR.set(-210);
+    delay(10);
     mL.set(0);
     mR.set(0);
   }
