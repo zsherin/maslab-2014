@@ -231,8 +231,8 @@ public:
 //Ultra ultra7 = Ultra(36,35);
 Ultra sonars[] = {};//{ultra1,ultra2,ultra4,ultra5,ultra6};
 FancyGyro gyro = FancyGyro();
-MotorE motorL = MotorE(2,3,4,18,17);
-MotorE motorR = MotorE(5,6,7,20,19);
+MotorE motorL = MotorE(2,3,4,30,31);
+MotorE motorR = MotorE(5,6,7,32,33);
 
 //Higher Class and Methods
 class Locator{
