@@ -222,17 +222,17 @@ public:
 
 
 //Components
-Ultra ultra1 = Ultra(23,24);
-Ultra ultra2 = Ultra(26,25);
+//Ultra ultra1 = Ultra(23,24);
+//Ultra ultra2 = Ultra(26,25);
 //Ultra ultra3 = Ultra(28,27);
-Ultra ultra4 = Ultra(30,29);
-Ultra ultra5 = Ultra(32,31);
-Ultra ultra6 = Ultra(34,33);
+//Ultra ultra4 = Ultra(30,29);
+//Ultra ultra5 = Ultra(32,31);
+//Ultra ultra6 = Ultra(34,33);
 //Ultra ultra7 = Ultra(36,35);
-Ultra sonars[] = {ultra1,ultra2,ultra4,ultra5,ultra6};
+Ultra sonars[] = {};//{ultra1,ultra2,ultra4,ultra5,ultra6};
 FancyGyro gyro = FancyGyro();
-MotorE motorL = MotorE(4,3,2,18,17);
-MotorE motorR = MotorE(7,6,5,20,19);
+MotorE motorL = MotorE(2,3,4,18,17);
+MotorE motorR = MotorE(5,6,7,20,19);
 
 //Higher Class and Methods
 class Locator{
