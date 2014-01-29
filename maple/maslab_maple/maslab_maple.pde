@@ -261,12 +261,12 @@ class Locator{
   
 };
 Locator loc = Locator();
-void ultra1ISR(){ ultra1.sample();}
-void ultra2ISR(){ ultra2.sample();}
+//void ultra1ISR(){ ultra1.sample();}
+//void ultra2ISR(){ ultra2.sample();}
 //void ultra3ISR(){ ultra3.sample();}
-void ultra4ISR(){ ultra4.sample();}
-void ultra5ISR(){ ultra5.sample();}
-void ultra6ISR(){ ultra6.sample();}
+//void ultra4ISR(){ ultra4.sample();}
+//void ultra5ISR(){ ultra5.sample();}
+//void ultra6ISR(){ ultra6.sample();}
 //void ultra7ISR(){ ultra7.sample();}
 
 void motorLISR(){ motorL.sample();}
@@ -275,12 +275,12 @@ int charCount;
 byte state;
 void setup() {
   noInterrupts();
-  attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
-  attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
+//  attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
+//  attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
 //  attachInterrupt(ultra3.echo, ultra3ISR, CHANGE);
-  attachInterrupt(ultra4.echo, ultra4ISR, CHANGE);
-  attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
-  attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
+//  attachInterrupt(ultra4.echo, ultra4ISR, CHANGE);
+//  attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
+//  attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
 //  attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
   attachInterrupt(motorL.encoder1Pin,motorLISR,RISING);
   attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
