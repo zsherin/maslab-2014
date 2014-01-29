@@ -103,6 +103,25 @@ public:
   }
 };
 
+//Trinary Servo
+class ServoT{
+  public:
+  uint8 currState;
+  uint8 states[];
+  uint8 pwmPin;
+  ServoT(uint8 _pwmPin, uint8 _states):
+  pwmPin(_pwmPin), _states(states){
+    currState =0;
+    set(currState);
+    pinMode(pwmPin,PWM);
+  }
+  void set(uint8 sState){
+    currState = sState;
+    pwmWrite(pwmPin,states[currState]);
+  }
+  
+};
+
 //Motor w/Encoder Controller V1.0
 //TODO add PID for Motor w/ Encoder
 class MotorE{
@@ -289,6 +308,13 @@ void setup() {
   charCount = 0;
   state = 0x00;
   motorG.set(50);
+  //Wall Detection
+  pinMode(15,INPUT);
+  pinMode(16,INPUT);
+  pinMode(17,INPUT);
+  pinMode(18,INPUT);
+  pinMode(19,INPUT);
+  
 }
 
 char buf[4];
@@ -352,16 +378,30 @@ void loop() {
   }
   
   //Internal Sensor Updates
-  
-  //Sonar
-  /*if(sTime-cTime > 20){
-    uint8 trigPin = sonars[sNum%7].trig;
-    digitalWrite(trigPin,HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin,LOW);
-    sNum++;
-    sTime = cTime;
-  }*/
+  //Wall Detection
+    //FRONT
+  if (digitalRead(18) ||digitalRead(17)){
+    motorR.set(-50);
+    motorL.set(-50);
+    delay(1000);
+  }
+    //LEFT
+  else if (digitalRead(19)){
+    motorR.set(-50);
+    motorL.set(50);
+    delay(500);
+  }  
+    //RIGHT
+  else if (digitalRead(16)){
+    motorR.set(50);
+    motorL.set(-50);
+    delay(500);
+  }//Back
+  else if (digitalRead(15)){
+    motorR.set(50);
+    motorL.set(50);
+    delay(500);
+  }  
   
   //Relative Localization.
   /*if(gTime-cTime > 10){
