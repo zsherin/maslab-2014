@@ -40,6 +40,8 @@ public class KitBotModel {
     	motorA = (byte)(-motorConstrain(powerA)*127);
 		motorB = (byte)(motorConstrain(powerB)*127);
 		updateMotor();
+
+		System.out.println("Motors:" + motorA + "," + motorB);
 	}
 	/**
 	 * Sets Hard Limit to the motors

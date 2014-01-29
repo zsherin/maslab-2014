@@ -140,7 +140,7 @@ public class KitBotMain {
 			    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 			    Imgproc.findContours(mask, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			   
-			     Point p = GetClosest(contours,10000000);
+			    Point p = GetClosest(contours,10000000);
 			    //Imgproc.findContours(maskTwo, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			    
 			    //p = GetClosest(contours, ( Math.sqrt(Math.pow((p.x-oldP.x), 2)+Math.pow((p.y-oldP.y), 2))));
@@ -151,8 +151,8 @@ public class KitBotMain {
 			   
 				updateWindow(opencvPane, frame);
  			    
- 			    //System.out.println("Captured Frame Width " + frame.width());
- 			    //System.out.println("x" + p.x +"y:"  +p.y);
+ 			    System.out.println("Captured Frame Width " + frame.width());
+ 			    System.out.println("x" + p.x +"y:"  +p.y);
  			    //Tracking
  			    if(Double.isNaN(p.x)){ 
  			    	p.x = frame.width()/2;
@@ -170,14 +170,13 @@ public class KitBotMain {
  			    	trackAngle = Math.PI/2 - 0.1 -setCamAngle;
  			    }
  			    double forMag = 2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
- 			    if(controller.EmgStop == true)
- 			    {
+ 			    if(controller.EmgStop == true){
  			    	model.finalize();
  			    	break;
  			    }
- 			    model.setMotors(forMag+rolMag, forMag -rolMag);
- 			    model.updatePos();
- 			    view.repaint();
+ 			    model.setMotors(forMag+rolMag, forMag -rolMag);//0.4,0.4);//
+ 			    //model.updatePos();
+ 			    //view.repaint();
     		} catch ( Exception e ) {}
     	}
     }

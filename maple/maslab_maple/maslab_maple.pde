@@ -160,14 +160,14 @@ public:
   uint8 pwmPin;
   uint8 dirPin;
   uint8 gndPin;
-  
+  int8 dir;
   Motor(uint8 _gndPin, uint8 _pwmPin, uint8 _dirPin) : 
   gndPin(_gndPin), pwmPin(_pwmPin), dirPin(_dirPin){
     pinMode(gndPin, OUTPUT);
     pinMode(pwmPin, PWM);
     pinMode(dirPin, OUTPUT);
     digitalWrite(gndPin,LOW);
-    int8 dir = 0;
+    dir = 0;
     set(dir);
   }
   void set(int8 dir){
@@ -231,9 +231,9 @@ public:
 //Ultra ultra7 = Ultra(36,35);
 //Ultra sonars[] = {};//{ultra1,ultra2,ultra4,ultra5,ultra6};
 FancyGyro gyro = FancyGyro();
-MotorE motorL = MotorE(5,6,7,30,31);
-MotorE motorR = MotorE(2,3,4,32,33);
-
+MotorE motorL = MotorE(4,3,2,30,31);
+MotorE motorR = MotorE(7,6,5,32,33);
+Motor motorG = Motor(37,14,13);
 //Higher Class and Methods
 class Locator{
   public:
@@ -288,6 +288,7 @@ void setup() {
   //For Motor
   charCount = 0;
   state = 0x00;
+  motorG.set(50);
 }
 
 char buf[4];
@@ -296,6 +297,7 @@ int8 sNum = 0; //sonar number
 uint32 sTime = micros(); //sonar time;
 uint32 gTime = micros();
 uint32 lTime = micros();
+uint32 tTime = micros();
 void loop() {
   //Serial Communications
   if(SerialUSB.available()) {
@@ -322,7 +324,6 @@ void loop() {
           motorL.set(0);
           motorR.set(0);
           while(true){
-            
           }
         }
         break;
@@ -342,6 +343,14 @@ void loop() {
   }
   
   uint32 cTime = micros();
+  
+  if(cTime-tTime > 5000000){
+    motorG.set(-50);
+    delay(400);
+    motorG.set(50);
+    tTime = cTime;
+  }
+  
   //Internal Sensor Updates
   
   //Sonar
@@ -369,10 +378,6 @@ void loop() {
   SerialUSB.print(loc.dx);
   SerialUSB.print("||");
   SerialUSB.println(loc.dy);*/
-  if(!SerialUSB){
-    motorL.set(0); 
-    motorR.set(0);
-  }
 }
 
 

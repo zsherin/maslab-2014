@@ -1,9 +1,9 @@
-#define MOT_A_DIR 2
-#define MOT_A_PWM 1
-#define MOT_A_GND 0
-#define MOT_B_DIR 7
-#define MOT_B_PWM 6
-#define MOT_B_GND 5
+#define MOT_A_DIR 5
+#define MOT_A_PWM 6
+#define MOT_A_GND 7
+#define MOT_B_DIR 2
+#define MOT_B_PWM 3
+#define MOT_B_GND 4
 
 #define FRAME_SIZE 4
 
