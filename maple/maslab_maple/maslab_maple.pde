@@ -181,7 +181,7 @@ public:
   }
 };
 
-
+/*
 // Ultrasonic Range  Finder V1.0
 class Ultra {
 public:
@@ -216,7 +216,7 @@ public:
   }
 };
 
-
+*/
 
 //Main LOOP
 
@@ -229,7 +229,7 @@ public:
 //Ultra ultra5 = Ultra(32,31);
 //Ultra ultra6 = Ultra(34,33);
 //Ultra ultra7 = Ultra(36,35);
-Ultra sonars[] = {};//{ultra1,ultra2,ultra4,ultra5,ultra6};
+//Ultra sonars[] = {};//{ultra1,ultra2,ultra4,ultra5,ultra6};
 FancyGyro gyro = FancyGyro();
 MotorE motorL = MotorE(5,6,7,30,31);
 MotorE motorR = MotorE(2,3,4,32,33);
@@ -318,13 +318,6 @@ void loop() {
           loc.dx = 0;
           loc.dy = 0;
         }
-        else if(ch=='C'){//Sonar Upload
-          for(int i =0; i<5; i++){
-            SerialUSB.print((byte)sonars[i].readData());
-            SerialUSB.print(' ');
-          }
-            SerialUSB.print(' ');
-        }
         else if(ch =='D'){
           motorL.set(0);
           motorR.set(0);
@@ -338,7 +331,7 @@ void loop() {
         charCount++;
         if (charCount == 4) {
           if (ch == 'E') {
-            motorL.set(-buf[1]); 
+            motorL.set(buf[1]); 
             motorR.set(buf[2]);
           }
           charCount = 0;
@@ -352,17 +345,17 @@ void loop() {
   //Internal Sensor Updates
   
   //Sonar
-  if(sTime-cTime > 20){
+  /*if(sTime-cTime > 20){
     uint8 trigPin = sonars[sNum%7].trig;
     digitalWrite(trigPin,HIGH);
     delayMicroseconds(10);
     digitalWrite(trigPin,LOW);
     sNum++;
     sTime = cTime;
-  }
+  }*/
   
   //Relative Localization.
-  if(gTime-cTime > 10){
+  /*if(gTime-cTime > 10){
     gyro.sample();
     gTime = cTime;
   }
@@ -370,12 +363,16 @@ void loop() {
   if(lTime-cTime>1000){
     loc.update();
     lTime = cTime;
-  }/*
+  }
   SerialUSB.print(loc.heading);  
   SerialUSB.print("||");
   SerialUSB.print(loc.dx);
   SerialUSB.print("||");
   SerialUSB.println(loc.dy);*/
+  if(!SerialUSB){
+    motorL.set(0); 
+    motorR.set(0);
+  }
 }
 
 

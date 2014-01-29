@@ -172,7 +172,7 @@ public class KitBotMain {
  			    double forMag = 2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
  			    if(controller.EmgStop == true)
  			    {
- 			    	model.setMotors(0,0);
+ 			    	model.finalize();
  			    	break;
  			    }
  			    model.setMotors(forMag+rolMag, forMag -rolMag);
