@@ -231,8 +231,8 @@ public:
 //Ultra ultra7 = Ultra(36,35);
 Ultra sonars[] = {};//{ultra1,ultra2,ultra4,ultra5,ultra6};
 FancyGyro gyro = FancyGyro();
-MotorE motorL = MotorE(2,3,4,30,31);
-MotorE motorR = MotorE(5,6,7,32,33);
+MotorE motorL = MotorE(5,6,7,30,31);
+MotorE motorR = MotorE(2,3,4,32,33);
 
 //Higher Class and Methods
 class Locator{
@@ -338,7 +338,7 @@ void loop() {
         charCount++;
         if (charCount == 4) {
           if (ch == 'E') {
-            motorL.set(buf[1]); 
+            motorL.set(-buf[1]); 
             motorR.set(buf[2]);
           }
           charCount = 0;

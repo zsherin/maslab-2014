@@ -105,7 +105,7 @@ public class KitBotMain {
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 
 	    //Move 0.5 Meter forward
-		while(true){
+		/*while(true){
 			model.updatePos();
 			if(Math.abs(model.heading)> 0.1){
 				model.setMotors(0.5*model.heading, -0.5*model.heading);
@@ -116,7 +116,7 @@ public class KitBotMain {
 					break;
 				}
 			}
-		}
+		}*/
         //Chase Ball
     	long time = System.nanoTime();
     	while ( true ) {
@@ -140,7 +140,7 @@ public class KitBotMain {
 			    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 			    Imgproc.findContours(mask, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			   
-			    Point p = GetClosest(contours,10000000);
+			     Point p = GetClosest(contours,10000000);
 			    //Imgproc.findContours(maskTwo, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			    
 			    //p = GetClosest(contours, ( Math.sqrt(Math.pow((p.x-oldP.x), 2)+Math.pow((p.y-oldP.y), 2))));
