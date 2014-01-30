@@ -22,7 +22,7 @@ public class KitBotModel {
      */
 	public KitBotModel() {
 		try {
-			serialPort = new SerialPort("COM3");//Will attempt to read the first port found.
+			serialPort = new SerialPort("COM7");//Will attempt to read the first port found.
             serialPort.openPort();
             serialPort.setParams(115200, 8, 1, 0);
         }

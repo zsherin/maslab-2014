@@ -107,17 +107,17 @@ public:
 class ServoT{
   public:
   uint8 currState;
-  uint8 states[];
+  uint8 states;
   uint8 pwmPin;
   ServoT(uint8 _pwmPin, uint8 _states):
-  pwmPin(_pwmPin), _states(states){
+  pwmPin(_pwmPin), states(_states){
     currState =0;
     set(currState);
     pinMode(pwmPin,PWM);
   }
   void set(uint8 sState){
     currState = sState;
-    pwmWrite(pwmPin,states[currState]);
+    pwmWrite(pwmPin,states);
   }
   
 };
@@ -309,11 +309,11 @@ void setup() {
   state = 0x00;
   motorG.set(50);
   //Wall Detection
-  pinMode(15,INPUT);
-  pinMode(16,INPUT);
-  pinMode(17,INPUT);
-  pinMode(18,INPUT);
-  pinMode(19,INPUT);
+  pinMode(15,INPUT_PULLDOWN);
+  pinMode(16,INPUT_PULLDOWN);
+  pinMode(17,INPUT_PULLDOWN);
+  pinMode(18,INPUT_PULLDOWN);
+  pinMode(19,INPUT_PULLDOWN);
   
 }
 
@@ -381,26 +381,34 @@ void loop() {
   //Wall Detection
     //FRONT
   if (digitalRead(18) ||digitalRead(17)){
-    motorR.set(-50);
-    motorL.set(-50);
-    delay(1000);
+    motorR.set(20);
+    motorL.set(-20);
+    delay(200);
+    motorR.set(0);
+    motorL.set(0);
   }
     //LEFT
   else if (digitalRead(19)){
-    motorR.set(-50);
-    motorL.set(50);
-    delay(500);
+    motorR.set(20);
+    motorL.set(20);
+    delay(200);
+    motorR.set(0);
+    motorL.set(0);
   }  
     //RIGHT
   else if (digitalRead(16)){
-    motorR.set(50);
-    motorL.set(-50);
-    delay(500);
+    motorR.set(-20);
+    motorL.set(-20);
+    delay(200);
+    motorR.set(0);
+    motorL.set(0);
   }//Back
   else if (digitalRead(15)){
-    motorR.set(50);
-    motorL.set(50);
-    delay(500);
+    motorR.set(-20);
+    motorL.set(20);
+    delay(200);
+    motorR.set(0);
+    motorL.set(0);
   }  
   
   //Relative Localization.
