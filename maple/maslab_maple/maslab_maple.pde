@@ -293,7 +293,7 @@ void setup() {
 //  attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
 //  attachInterrupt(motorL.encoder1Pin,motorLISR,RISING);
 //  attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
-//  interrupts();
+  interrupts();
   //greenRelease.attach(28);
   //greenRelease.write(0);
   redRelease.attach(27);
@@ -308,7 +308,6 @@ void setup() {
   pinMode(17,INPUT_PULLDOWN);
   pinMode(18,INPUT_PULLDOWN);
   pinMode(19,INPUT_PULLDOWN);
-  
 }
 
 char buf[4];

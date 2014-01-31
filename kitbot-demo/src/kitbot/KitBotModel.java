@@ -72,7 +72,11 @@ public class KitBotModel {
 	}
 	public void disableWallDetect(){
 		try{
-			serialPort.writeByte((byte)'G');
+			byte[] data = new byte[2];
+			data[0] = 'G';
+			data[1] = 'E';
+			serialPort.writeBytes(data);
+
 		}catch(Exception ex){
 			System.out.println(ex);
 		}

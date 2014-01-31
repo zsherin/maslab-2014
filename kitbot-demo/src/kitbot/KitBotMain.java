@@ -91,13 +91,13 @@ public class KitBotMain {
     	 System.out.println("Hello, OpenCV");
 		    // Load the native library.
 		    System.loadLibrary("opencv_java248");
-		    VideoCapture camera = new VideoCapture(2);
-		    camera.open(2);// AC-useless? //Not Useless, actually //AC- Yay!
-		    /*boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
+		    VideoCapture camera = new VideoCapture(1);
+		    camera.open(1);// AC-useless? //Not Useless, actually //AC- Yay!
+		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
 		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,720);
 		    System.out.println(hset);
 		    System.out.println(wset);
-		    */
+		    
 		    System.out.println("CameraSet!");
 		    if(!camera.isOpened()){
 		        System.out.println("Camera Error");
@@ -122,7 +122,7 @@ public class KitBotMain {
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 			JLabel preoutPane = createWindow("OpenCV preoutput", width, height);
 			state = 2;
-			model.disableWallDetect();
+			//model.disableWallDetect();
 		//r forward
 		/*while(true){
 			model.updatePos();
