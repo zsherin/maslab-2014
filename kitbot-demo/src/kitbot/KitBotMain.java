@@ -170,30 +170,33 @@ public class KitBotMain {
 		System.out.println("***GAME STARTED***");
 		System.out.println("MAP --> " + botclient.getMap());
 	
-			*/
+		//	*/
         //Chase Ball
     	long time = System.nanoTime();
     	long startTime = time;
     	double MotorVal = -0.15;
     	while ( true ) {
     		try {
-    			long duration = (System.nanoTime()- time)/(long)Math.pow(10.0,9.0);// In seconds
+    			
+    			long duration = (System.nanoTime()- time);// In seconds
     			System.out.println("Current Fps:"+ 1.0/duration + "frame/Second.");
     			time = time + duration;
     			camera.read(frame);
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
- 			    if(time - startTime >=180000000000000.0){
+ 			    /*if(!botclient.gameStarted()){
  			    	model.setMotors(0,0);
  			    	model.finalize();
  			    	while(true){
  			    		
  			    	}
- 			    }
- 			   //RED: 
+ 			    }*/
+ 			   //RED: 1111111111111
+ 			    
+ 			    
 			    boolean teal=false;
- 			    //State Change Timer
- 			    if(state == 1&&time - startTime > 120000000000000.0){//After the first two minutes
+ 			    //State Change Timer                125799335116 
+ 			    if(state == 1 && time - startTime > 123000000000.0){//After the first two minutes
  			    	state = 2;
  			    	model.disableWallDetect();
  			    }
@@ -202,14 +205,14 @@ public class KitBotMain {
  			    //State Target
  			    if(state ==1) //BALL COLLECT
  			    { 
- 			    	Mat blueMask = new Mat();
+ 			    	/*Mat blueMask = new Mat();
  			    	Core.inRange(frameOut,new Scalar(100,100,100) , new Scalar(110,256,256), blueMask); 
 
  				    Imgproc.findContours(blueMask, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
  				    Point p = GetLargest(contours);
  				    
  					frameOut = new Mat(frameOut,new Rect(0,(int)p.y,width,height-(int)p.y));
- 					
+ 					*/
 				    Core.inRange(frameOut,new Scalar(0,100,100) , new Scalar(10,256,256), mask); 
 				    Core.inRange(frameOut,new Scalar(170,160,60) , new Scalar(180,256,256), maskTwo);
 				    Core.bitwise_or(maskTwo, mask, mask);
@@ -291,7 +294,7 @@ public class KitBotMain {
  			    	trackAngle = Math.PI/2 - 0.1 -setCamAngle;
  			    }
 
- 			    double forMag = -(float)(frameOut.height()-p.y)/frameOut.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
+ 			    double forMag = -(float)(frame.height()-p.y)/frame.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
  			    if(teal){
  			    	forMag = -Math.min((float)(46000-area)/(46000),.2);
  			    	rolMag *= 1.2;
