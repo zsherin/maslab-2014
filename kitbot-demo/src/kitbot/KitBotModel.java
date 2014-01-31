@@ -56,7 +56,27 @@ public class KitBotModel {
 		return oldpower;
 	}
 	
-	
+	public void releaseG(){
+		try{
+			serialPort.writeByte((byte)'F');
+		}catch(Exception ex){
+			System.out.println(ex);
+		}
+	}
+	public void releaseR(){
+		try{
+			serialPort.writeByte((byte)'E');
+		}catch(Exception ex){
+			System.out.println(ex);
+		}
+	}
+	public void disableWallDetect(){
+		try{
+			serialPort.writeByte((byte)'G');
+		}catch(Exception ex){
+			System.out.println(ex);
+		}
+	}
 	//SENSORY UPDATES
 	/**
 	 * updateMotor sends command to the Microcontroller and updates the motors.
