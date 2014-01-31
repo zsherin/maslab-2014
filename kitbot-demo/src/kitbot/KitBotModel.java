@@ -65,7 +65,7 @@ public class KitBotModel {
 	}
 	public void releaseR(){
 		try{
-			serialPort.writeByte((byte)'E');
+			serialPort.writeByte((byte)'G');
 		}catch(Exception ex){
 			System.out.println(ex);
 		}
@@ -73,10 +73,7 @@ public class KitBotModel {
 	public void disableWallDetect(){
 		try{
 			byte[] data = new byte[2];
-			data[0] = 'G';
-			data[1] = 'E';
-			serialPort.writeBytes(data);
-
+			serialPort.writeByte((byte)'H');
 		}catch(Exception ex){
 			System.out.println(ex);
 		}
