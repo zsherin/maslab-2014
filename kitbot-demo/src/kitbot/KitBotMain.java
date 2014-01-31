@@ -162,7 +162,7 @@ public class KitBotMain {
 			}
 		}
 		
-		*
+		*/
 		BotClient botclient = new BotClient("18.150.7.174:6667","mT82Qi240y",false);
 		
 		while( !botclient.gameStarted() ) {
@@ -184,13 +184,13 @@ public class KitBotMain {
     			camera.read(frame);
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
- 			    /*if(!botclient.gameStarted()){
+ 			    if(!botclient.gameStarted()){
  			    	model.setMotors(0,0);
  			    	model.finalize();
  			    	while(true){
  			    		
  			    	}
- 			    }*/
+ 			    }
  			   //RED: 1111111111111
  			    
  			    
