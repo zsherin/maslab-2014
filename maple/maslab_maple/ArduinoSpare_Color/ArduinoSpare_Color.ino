@@ -105,28 +105,24 @@ void loop()
 {
   sortServo.write(90);
   send_1M_pattern(pattern_test_rainbow, 10, 70);
-  delay(10);
   TCS();
   if((countR>100)||(countG>40))
   {
-     if(countG>=40)
-      {//GreenID
+     if(countG>=40){//GreenID
         Serial.println("Green");
         Serial.println("");
         sortServo.write(150);
-        delay(1000);
-      } 
-    else if(countR>=100)
-     {//RedID
+        delay(3000);
+      }else if(countR>=100){//RedID
         Serial.println("Red");
         Serial.println("");
         sortServo.write(0);
-        delay(1000);
+        delay(3000);
      }
    }
   else 
   {
-    delay(500);       
+    delay(300);       
   }
 }
 
