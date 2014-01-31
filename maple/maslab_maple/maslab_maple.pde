@@ -395,7 +395,7 @@ void loop() {
     //FRONT
   if(wallDetect){
     if (digitalRead(18) ||digitalRead(17)){
-      motorR.set(20);
+      motorR.set(40);
       motorL.set(-20);
       delay(200);
       motorR.set(0);
@@ -403,27 +403,32 @@ void loop() {
     }
       //LEFT
     else if (digitalRead(19)){
-      motorR.set(20);
-      motorL.set(20);
+      motorR.set(30);
+      motorL.set(30);
       delay(200);
       motorR.set(0);
       motorL.set(0);
     }  
       //RIGHT
     else if (digitalRead(16)){
-      motorR.set(-20);
-      motorL.set(-20);
+      motorR.set(-30);
+      motorL.set(-30);
       delay(200);
       motorR.set(0);
       motorL.set(0);
     }//Back
     else if (digitalRead(15)){
-      motorR.set(-20);
-      motorL.set(20);
+      motorR.set(-30);
+      motorL.set(30);
       delay(200);
       motorR.set(0);
       motorL.set(0);
     }  
+  }else{
+    if (digitalRead(18) ||digitalRead(17)){
+      motorR.set(0);
+      motorL.set(0);
+    }
   }
   
   //Relative Localization.

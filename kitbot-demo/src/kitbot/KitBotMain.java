@@ -116,6 +116,7 @@ public class KitBotMain {
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 			JLabel preoutPane = createWindow("OpenCV preoutput", width, height);
 			state = 2;
+			model.disableWallDetect();
 		//r forward
 		/*while(true){
 			model.updatePos();
@@ -157,6 +158,7 @@ public class KitBotMain {
  			    //State Change Timer
  			    if(state == 1&&time - startTime > 120000000000000.0){//After the first two minutes
  			    	state = 2;
+ 			    	model.disableWallDetect();
  			    }
  			    
  			    //State Target
@@ -234,7 +236,7 @@ public class KitBotMain {
  			    double forMag = -(float)(frame.height()-p.y)/frame.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
  			    if(teal)
  			    {
- 			    	forMag = -Math.min((float)(50000-area)/(50000),.3);
+ 			    	forMag = -Math.min((float)(46000-area)/(46000),.2);
  			    }
  			    else if(state ==3){
  			    	forMag =0;
