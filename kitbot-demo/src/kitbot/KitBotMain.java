@@ -116,7 +116,7 @@ public class KitBotMain {
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 			JLabel preoutPane = createWindow("OpenCV preoutput", width, height);
 			state = 2;
-			model.disableWallDetect();
+			model.disableWallDetect(); 
 		//r forward
 		/*while(true){
 			model.updatePos();
@@ -145,7 +145,6 @@ public class KitBotMain {
     	long startTime = time;
     	while ( true ) {
     		try {
-    			
     			long duration = (System.nanoTime()- time)/(long)Math.pow(10.0,9.0);// In seconds
     			System.out.println("Current Fps:"+ 1.0/duration + "frame/Second.");
     			time = time + duration;

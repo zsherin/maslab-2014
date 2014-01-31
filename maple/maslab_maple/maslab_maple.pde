@@ -295,7 +295,7 @@ void setup() {
 //  attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
 //  interrupts();
   
-  greenRelease.attach(27);
+  greenRelease.attach(24);
   greenRelease.write(0);
   redRelease.attach(28);
   redRelease.write(0);
@@ -428,6 +428,7 @@ void loop() {
     if (digitalRead(18) ||digitalRead(17)){
       motorR.set(0);
       motorL.set(0);
+      delay(100);
     }
   }
   
