@@ -103,6 +103,25 @@ public:
   }
 };
 
+//Trinary Servo
+class ServoT{
+  public:
+  uint8 currState;
+  uint8 states;
+  uint8 pwmPin;
+  ServoT(uint8 _pwmPin, uint8 _states):
+  pwmPin(_pwmPin), states(_states){
+    currState =0;
+    set(currState);
+    pinMode(pwmPin,PWM);
+  }
+  void set(uint8 sState){
+    currState = sState;
+    pwmWrite(pwmPin,states);
+  }
+  
+};
+
 //Motor w/Encoder Controller V1.0
 //TODO add PID for Motor w/ Encoder
 class MotorE{
@@ -160,14 +179,14 @@ public:
   uint8 pwmPin;
   uint8 dirPin;
   uint8 gndPin;
-  
+  int8 dir;
   Motor(uint8 _gndPin, uint8 _pwmPin, uint8 _dirPin) : 
   gndPin(_gndPin), pwmPin(_pwmPin), dirPin(_dirPin){
     pinMode(gndPin, OUTPUT);
     pinMode(pwmPin, PWM);
     pinMode(dirPin, OUTPUT);
     digitalWrite(gndPin,LOW);
-    int8 dir = 0;
+    dir = 0;
     set(dir);
   }
   void set(int8 dir){
@@ -231,9 +250,9 @@ public:
 //Ultra ultra7 = Ultra(36,35);
 //Ultra sonars[] = {};//{ultra1,ultra2,ultra4,ultra5,ultra6};
 FancyGyro gyro = FancyGyro();
-MotorE motorL = MotorE(5,6,7,30,31);
-MotorE motorR = MotorE(2,3,4,32,33);
-
+MotorE motorL = MotorE(4,3,2,30,31);
+MotorE motorR = MotorE(7,6,5,32,33);
+Motor motorG = Motor(37,14,13);
 //Higher Class and Methods
 class Locator{
   public:
@@ -288,6 +307,14 @@ void setup() {
   //For Motor
   charCount = 0;
   state = 0x00;
+  motorG.set(50);
+  //Wall Detection
+  pinMode(15,INPUT_PULLDOWN);
+  pinMode(16,INPUT_PULLDOWN);
+  pinMode(17,INPUT_PULLDOWN);
+  pinMode(18,INPUT_PULLDOWN);
+  pinMode(19,INPUT_PULLDOWN);
+  
 }
 
 char buf[4];
@@ -296,6 +323,7 @@ int8 sNum = 0; //sonar number
 uint32 sTime = micros(); //sonar time;
 uint32 gTime = micros();
 uint32 lTime = micros();
+uint32 tTime = micros();
 void loop() {
   //Serial Communications
   if(SerialUSB.available()) {
@@ -322,7 +350,6 @@ void loop() {
           motorL.set(0);
           motorR.set(0);
           while(true){
-            
           }
         }
         break;
@@ -342,17 +369,47 @@ void loop() {
   }
   
   uint32 cTime = micros();
-  //Internal Sensor Updates
   
-  //Sonar
-  /*if(sTime-cTime > 20){
-    uint8 trigPin = sonars[sNum%7].trig;
-    digitalWrite(trigPin,HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin,LOW);
-    sNum++;
-    sTime = cTime;
-  }*/
+  if(cTime-tTime > 5000000){
+    motorG.set(-50);
+    delay(400);
+    motorG.set(50);
+    tTime = cTime;
+  }
+  
+  //Internal Sensor Updates
+  //Wall Detection
+    //FRONT
+  if (digitalRead(18) ||digitalRead(17)){
+    motorR.set(20);
+    motorL.set(-20);
+    delay(200);
+    motorR.set(0);
+    motorL.set(0);
+  }
+    //LEFT
+  else if (digitalRead(19)){
+    motorR.set(20);
+    motorL.set(20);
+    delay(200);
+    motorR.set(0);
+    motorL.set(0);
+  }  
+    //RIGHT
+  else if (digitalRead(16)){
+    motorR.set(-20);
+    motorL.set(-20);
+    delay(200);
+    motorR.set(0);
+    motorL.set(0);
+  }//Back
+  else if (digitalRead(15)){
+    motorR.set(-20);
+    motorL.set(20);
+    delay(200);
+    motorR.set(0);
+    motorL.set(0);
+  }  
   
   //Relative Localization.
   /*if(gTime-cTime > 10){
@@ -369,10 +426,6 @@ void loop() {
   SerialUSB.print(loc.dx);
   SerialUSB.print("||");
   SerialUSB.println(loc.dy);*/
-  if(!SerialUSB){
-    motorL.set(0); 
-    motorR.set(0);
-  }
 }
 
 

@@ -84,6 +84,7 @@ public class KitBotMain {
 		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,720);
 		    System.out.println(hset);
 		    System.out.println(wset);
+		    
 		    System.out.println("CameraSet!");
 		    if(!camera.isOpened()){
 		        System.out.println("Camera Error");
@@ -125,7 +126,17 @@ public class KitBotMain {
 					break;
 				}
 			}
-		}*/
+		}
+		
+		*/
+		BotClient botclient = new BotClient("18.150.7.174:6667","mT82Qi240y",false);
+		
+		while( !botclient.gameStarted() ) {
+		}
+		System.out.println("***GAME STARTED***");
+		System.out.println("MAP --> " + botclient.getMap());
+	
+			
         //Chase Ball
     	long time = System.nanoTime();
     	while ( true ) {
@@ -137,6 +148,7 @@ public class KitBotMain {
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
  			   //RED: 
+<<<<<<< HEAD
  			    if(state ==1) //BALL COLLECT
  			    {
 				    Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
@@ -152,6 +164,13 @@ public class KitBotMain {
  				    Core.bitwise_or(maskTwo, mask, mask);
  			    }
 				Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
+=======
+			   // Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
+			   // Core.inRange(frameOut,new Scalar(170,160,60) , new Scalar(180,256,256), mask); 
+			    //GREEN:
+			    Core.inRange(frameOut,new Scalar(38,160,60) , new Scalar(75,256,256), mask); 
+			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
+>>>>>>> fd809d2c3faabad743f864f65d5c7a1245828588
 			    /* No difference
 			    camera.release();1
 			    */
@@ -159,7 +178,7 @@ public class KitBotMain {
 			    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 			    Imgproc.findContours(mask, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			   
-			     Point p = GetClosest(contours,10000000);
+			    Point p = GetClosest(contours,10000000);
 			    //Imgproc.findContours(maskTwo, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			    
 			    //p = GetClosest(contours, ( Math.sqrt(Math.pow((p.x-oldP.x), 2)+Math.pow((p.y-oldP.y), 2))));
@@ -170,17 +189,18 @@ public class KitBotMain {
 			   
 				updateWindow(opencvPane, frame);
  			    
- 			    //System.out.println("Captured Frame Width " + frame.width());
- 			    //System.out.println("x" + p.x +"y:"  +p.y);
+ 			    System.out.println("Captured Frame Width " + frame.width());
+ 			    System.out.println("x" + p.x +"y:"  +p.y);
  			    //Tracking
- 			    if(Double.isNaN(p.x)){ 
+ 			    if(Double.isNaN(p.x)|| p.x == 0){ 
  			    	p.x = frame.width()/2;
  			    	p.y = frame.height()/2;
+ 			    	model.setMotors(-0.17,-0.08);
  			    	continue;
  			    }
  			    double rolMag = 0.5*((p.x - frame.width()/2 ) / frame.width());
  			    double camHeight = 0.1778;//m
- 			    double desiredDist = 0.2;//m;
+ 			    double desiredDist = -0.2;//m;
  			    double setCamAngle =  0.785398163;//radian
  			    //Some Math
  			    //p.yConstrain
@@ -188,15 +208,15 @@ public class KitBotMain {
  			    if(trackAngle + setCamAngle > Math.PI/2-0.1){ //Set hard limit that ball can only be 2m away.
  			    	trackAngle = Math.PI/2 - 0.1 -setCamAngle;
  			    }
- 			    double forMag = 2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
- 			    if(controller.EmgStop == true)
- 			    {
+ 			    double forMag = -(float)(frame.height()-p.y)/frame.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
+ 			    System.out.println("Forward:" + forMag);
+ 			    if(controller.EmgStop == true){
  			    	model.finalize();
  			    	break;
  			    }
- 			    model.setMotors(forMag+rolMag, forMag -rolMag);
- 			    model.updatePos();
- 			    view.repaint();
+ 			    model.setMotors(forMag-rolMag, forMag+rolMag);//0.4,0.4);//
+ 			    //model.updatePos();
+ 			    //view.repaint();
     		} catch ( Exception e ) {}
     	}
     }
