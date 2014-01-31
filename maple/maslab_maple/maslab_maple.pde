@@ -283,7 +283,7 @@ boolean wallDetect;
 void setup() {
   gameStart = false;
   wallDetect = true;
-  noInterrupts();
+  //noInterrupts();
 //  attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
 //  attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
 //  attachInterrupt(ultra3.echo, ultra3ISR, CHANGE);
@@ -294,10 +294,9 @@ void setup() {
 //  attachInterrupt(motorL.encoder1Pin,motorLISR,RISING);
 //  attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
 //  interrupts();
-  
-  greenRelease.attach(27);
-  greenRelease.write(0);
-  redRelease.attach(28);
+  //greenRelease.attach(28);
+  //greenRelease.write(0);
+  redRelease.attach(27);
   redRelease.write(0);
   //For Motor
   charCount = 0;
@@ -395,7 +394,7 @@ void loop() {
     //FRONT
   if(wallDetect){
     if (digitalRead(18) ||digitalRead(17)){
-      motorR.set(20);
+      motorR.set(40);
       motorL.set(-20);
       delay(200);
       motorR.set(0);
@@ -403,27 +402,32 @@ void loop() {
     }
       //LEFT
     else if (digitalRead(19)){
-      motorR.set(20);
-      motorL.set(20);
+      motorR.set(30);
+      motorL.set(30);
       delay(200);
       motorR.set(0);
       motorL.set(0);
     }  
       //RIGHT
     else if (digitalRead(16)){
-      motorR.set(-20);
-      motorL.set(-20);
+      motorR.set(-30);
+      motorL.set(-30);
       delay(200);
       motorR.set(0);
       motorL.set(0);
     }//Back
     else if (digitalRead(15)){
-      motorR.set(-20);
-      motorL.set(20);
+      motorR.set(-30);
+      motorL.set(30);
       delay(200);
       motorR.set(0);
       motorL.set(0);
     }  
+  }else{
+    if (digitalRead(18) ||digitalRead(17)){
+      motorR.set(0);
+      motorL.set(0);
+    }
   }
   
   //Relative Localization.

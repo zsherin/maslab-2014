@@ -29,12 +29,13 @@ public class KitBotMain {
 	static Point oldP;
 	static int state;
 	static double area;
+	static double maxArea;
 	private static Point GetClosest( List<MatOfPoint> contours, double dist, boolean teal)
 	   {
 		   int minArea = 10;
 		   
 		   Point p = new Point();
-			System.out.println("HELLO");
+		
 		   for (int idx = 0; idx < contours.size(); idx++) {
 		        Mat contour = contours.get(idx);
 		        double contourarea = Imgproc.contourArea(contour);
@@ -51,6 +52,11 @@ public class KitBotMain {
 		            if(newDist < dist)
 		            {
 		            	area =contourarea;
+		            	if(teal&&area>maxArea)
+		            	{
+		            		maxArea=area;
+		            	}
+		           
 		            	//area = contourarea;
 		            	p = new Point(x,y);
 		            	dist = newDist;
@@ -85,13 +91,13 @@ public class KitBotMain {
     	 System.out.println("Hello, OpenCV");
 		    // Load the native library.
 		    System.loadLibrary("opencv_java248");
-		    VideoCapture camera = new VideoCapture(1);
-		    camera.open(1); //Not Useless, actually //AC- Yay!
-		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
+		    VideoCapture camera = new VideoCapture(2);
+		    camera.open(2);// AC-useless? //Not Useless, actually //AC- Yay!
+		    /*boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
 		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,720);
 		    System.out.println(hset);
 		    System.out.println(wset);
-		    
+		    */
 		    System.out.println("CameraSet!");
 		    if(!camera.isOpened()){
 		        System.out.println("Camera Error");
@@ -116,6 +122,7 @@ public class KitBotMain {
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 			JLabel preoutPane = createWindow("OpenCV preoutput", width, height);
 			state = 2;
+			model.disableWallDetect();
 		//r forward
 		/*while(true){
 			model.updatePos();
@@ -142,6 +149,7 @@ public class KitBotMain {
         //Chase Ball
     	long time = System.nanoTime();
     	long startTime = time;
+    	double MotorVal = 0.15;
     	while ( true ) {
     		try {
     			
@@ -157,6 +165,7 @@ public class KitBotMain {
  			    //State Change Timer
  			    if(state == 1&&time - startTime > 120000000000000.0){//After the first two minutes
  			    	state = 2;
+ 			    	model.disableWallDetect();
  			    }
  			    
  			    //State Target
@@ -219,7 +228,12 @@ public class KitBotMain {
  			    	p.x = frame.width()/2;
  			    	p.y = frame.height()/2;
  			    	model.setMotors(-0.17,-0.08);
- 			    	continue;
+ 			    	if(maxArea>30000)
+ 			    	{
+ 			    		state=3;
+ 			    	}else{
+ 			    		continue;
+ 			    	}
  			    }
  			    double rolMag = 0.5*((p.x - frame.width()/2 ) / frame.width());
  			    double camHeight = 0.1778;//m
@@ -234,10 +248,12 @@ public class KitBotMain {
  			    double forMag = -(float)(frame.height()-p.y)/frame.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
  			    if(teal)
  			    {
- 			    	forMag = -Math.min((float)(50000-area)/(50000),.3);
+ 			    	forMag = -Math.min((float)(46000-area)/(46000),.2);
+ 			    	rolMag *= 1.2;
  			    }
  			    else if(state ==3){
- 			    	forMag =0;
+ 			    	forMag = MotorVal;
+ 			    	MotorVal -= 0.01;
  			    }
  			    System.out.println("Forward:" + forMag);
  			    if(controller.EmgStop == true){
