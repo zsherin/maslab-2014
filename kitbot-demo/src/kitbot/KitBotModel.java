@@ -22,7 +22,7 @@ public class KitBotModel {
      */
 	public KitBotModel() {
 		try {
-			serialPort = new SerialPort("COM7");//Will attempt to read the first port found.
+			serialPort = new SerialPort("COM6");//Will attempt to read the first port found.
             serialPort.openPort();
             serialPort.setParams(115200, 8, 1, 0);
         }
@@ -56,7 +56,27 @@ public class KitBotModel {
 		return oldpower;
 	}
 	
-	
+	public void releaseG(){
+		try{
+			serialPort.writeByte((byte)'F');
+		}catch(Exception ex){
+			System.out.println(ex);
+		}
+	}
+	public void releaseR(){
+		try{
+			serialPort.writeByte((byte)'E');
+		}catch(Exception ex){
+			System.out.println(ex);
+		}
+	}
+	public void disableWallDetect(){
+		try{
+			serialPort.writeByte((byte)'G');
+		}catch(Exception ex){
+			System.out.println(ex);
+		}
+	}
 	//SENSORY UPDATES
 	/**
 	 * updateMotor sends command to the Microcontroller and updates the motors.
