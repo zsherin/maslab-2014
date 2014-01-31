@@ -107,14 +107,7 @@ public class KitBotMain {
 			 height = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT));
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 			
-			BotClient botclient = new BotClient("18.150.7.174:6667","mT82Qi240y",false);
-			
-			while( !botclient.gameStarted() ) {
-			}
-			System.out.println("***GAME STARTED***");
-			System.out.println("MAP --> " + botclient.getMap());
-			
-	    //Move 0.5 Meter forward
+		//r forward
 		/*while(true){
 			model.updatePos();
 			if(Math.abs(model.heading)> 0.1){
@@ -148,7 +141,7 @@ public class KitBotMain {
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
  			   //RED: 
-<<<<<<< HEAD
+
  			    if(state ==1) //BALL COLLECT
  			    {
 				    Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
@@ -164,13 +157,12 @@ public class KitBotMain {
  				    Core.bitwise_or(maskTwo, mask, mask);
  			    }
 				Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
-=======
+
 			   // Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
 			   // Core.inRange(frameOut,new Scalar(170,160,60) , new Scalar(180,256,256), mask); 
 			    //GREEN:
 			    Core.inRange(frameOut,new Scalar(38,160,60) , new Scalar(75,256,256), mask); 
 			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
->>>>>>> fd809d2c3faabad743f864f65d5c7a1245828588
 			    /* No difference
 			    camera.release();1
 			    */
