@@ -48,7 +48,11 @@ public class KitBotMain {
 		            double newDist = Math.sqrt(Math.pow((x-oldP.x), 2)+Math.pow((y-oldP.y), 2));
 		            if(newDist < dist)
 		            {
+<<<<<<< HEAD
 		            	area=contourarea;
+=======
+		            	area = contourarea;
+>>>>>>> 2a21d35a20555d024540ec09e05c97ada53b771e
 		            	p = new Point(x,y);
 		            	dist = newDist;
 		            }
@@ -109,7 +113,7 @@ public class KitBotMain {
 		     width = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_WIDTH));
 			 height = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT));
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
-			
+			state = 2;
 		//r forward
 		/*while(true){
 			model.updatePos();
@@ -124,7 +128,7 @@ public class KitBotMain {
 			}
 		}
 		
-		*/
+		*
 		BotClient botclient = new BotClient("18.150.7.174:6667","mT82Qi240y",false);
 		
 		while( !botclient.gameStarted() ) {
@@ -132,7 +136,7 @@ public class KitBotMain {
 		System.out.println("***GAME STARTED***");
 		System.out.println("MAP --> " + botclient.getMap());
 	
-			
+			*/
         //Chase Ball
     	long time = System.nanoTime();
     	while ( true ) {
@@ -156,7 +160,11 @@ public class KitBotMain {
  			    }
  			    if(state ==2) //SEEK GOAL
  			    {
+<<<<<<< HEAD
  			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask); 
+=======
+ 			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask);
+>>>>>>> 2a21d35a20555d024540ec09e05c97ada53b771e
  			    }
 				Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
 
@@ -181,7 +189,7 @@ public class KitBotMain {
 			   
 				updateWindow(opencvPane, frame);
  			    
- 			    System.out.println("Captured Frame Width " + frame.width());
+ 			    System.out.println("area of viewed thingy : " + area);
  			    System.out.println("x" + p.x +"y:"  +p.y);
  			    //Tracking
  			    if(Double.isNaN(p.x)|| p.x == 0){ 

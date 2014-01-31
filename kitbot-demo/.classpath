@@ -11,9 +11,9 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/kitbot-demo/lib/jSSC-2.6.0-Release/javadoc/jssc-2.6.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/zach/Documents/Maslab/opencv/build/java/opencv-248.jar">
+	<classpathentry kind="lib" path="C:/Users/Admin/Downloads/opencv/build/java/opencv-248.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/zach/Documents/Maslab/opencv/build/java/x64"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Admin/Downloads/opencv/build/java/x64"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

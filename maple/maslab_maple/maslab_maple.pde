@@ -1,3 +1,5 @@
+#include <Servo.h>
+
 
 /*
 MAPLE Microcontroller Code in Processing
@@ -103,24 +105,6 @@ public:
   }
 };
 
-//Trinary Servo
-class ServoT{
-  public:
-  uint8 currState;
-  uint8 states;
-  uint8 pwmPin;
-  ServoT(uint8 _pwmPin, uint8 _states):
-  pwmPin(_pwmPin), states(_states){
-    currState =0;
-    set(currState);
-    pinMode(pwmPin,PWM);
-  }
-  void set(uint8 sState){
-    currState = sState;
-    pwmWrite(pwmPin,states);
-  }
-  
-};
 
 //Motor w/Encoder Controller V1.0
 //TODO add PID for Motor w/ Encoder
@@ -253,6 +237,8 @@ FancyGyro gyro = FancyGyro();
 MotorE motorL = MotorE(4,3,2,30,31);
 MotorE motorR = MotorE(7,6,5,32,33);
 Motor motorG = Motor(37,14,13);
+Servo greenRelease;
+Servo redRelease;
 //Higher Class and Methods
 class Locator{
   public:
@@ -290,9 +276,11 @@ Locator loc = Locator();
 
 void motorLISR(){ motorL.sample();}
 void motorRISR(){ motorR.sample();}
+boolean gameStart;
 int charCount;
 byte state;
 void setup() {
+  gameStart = false;
   noInterrupts();
 //  attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
 //  attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
@@ -301,13 +289,18 @@ void setup() {
 //  attachInterrupt(ultra5.echo, ultra5ISR, CHANGE);
 //  attachInterrupt(ultra6.echo, ultra6ISR, CHANGE);
 //  attachInterrupt(ultra7.echo, ultra7ISR, CHANGE);
-  attachInterrupt(motorL.encoder1Pin,motorLISR,RISING);
-  attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
-  interrupts();
+//  attachInterrupt(motorL.encoder1Pin,motorLISR,RISING);
+//  attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
+//  interrupts();
+  
+  greenRelease.attach(27);
+  greenRelease.write(0);
+  redRelease.attach(28);
+  redRelease.write(0);
   //For Motor
   charCount = 0;
   state = 0x00;
-  motorG.set(50);
+  motorG.set(0);
   //Wall Detection
   pinMode(15,INPUT_PULLDOWN);
   pinMode(16,INPUT_PULLDOWN);
@@ -330,7 +323,11 @@ void loop() {
     char ch = SerialUSB.read();
     switch(state){
       case 0x00: //In Main
-        if(ch == 'A') {//Motor Initializer
+        if (ch == 'Z'){//start
+          gameStart = true;
+          motorG.set(50);
+        }
+        else if(ch == 'A') {//Motor Initializer
           state = 0x01;
           charCount=1;
           buf[0] = 'A';
@@ -346,11 +343,19 @@ void loop() {
           loc.dx = 0;
           loc.dy = 0;
         }
-        else if(ch =='D'){
+        else if(ch =='D'){//Stop
+          gameStart = false;
           motorL.set(0);
           motorR.set(0);
+          motorG.set(0);
           while(true){
           }
+        }
+        else if(ch == 'E'){//Release a Red
+          redRelease.write(90);
+        }
+        else if(ch = 'F'){//Release a Green
+          greenRelease.write(180);
         }
         break;
       case 0x01: //In Motor
@@ -370,7 +375,7 @@ void loop() {
   
   uint32 cTime = micros();
   
-  if(cTime-tTime > 5000000){
+  if(gameStart&&cTime-tTime > 000000){
     motorG.set(-50);
     delay(400);
     motorG.set(50);
