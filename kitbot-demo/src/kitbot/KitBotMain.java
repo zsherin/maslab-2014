@@ -119,7 +119,7 @@ public class KitBotMain {
 			}
 		}
 		
-		*/
+		*
 		BotClient botclient = new BotClient("18.150.7.174:6667","mT82Qi240y",false);
 		
 		while( !botclient.gameStarted() ) {
@@ -127,7 +127,7 @@ public class KitBotMain {
 		System.out.println("***GAME STARTED***");
 		System.out.println("MAP --> " + botclient.getMap());
 	
-			
+			*/
         //Chase Ball
     	long time = System.nanoTime();
     	while ( true ) {
