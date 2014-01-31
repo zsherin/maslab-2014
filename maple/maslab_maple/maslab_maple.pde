@@ -146,9 +146,14 @@ class MotorE{
     uint16 dirMag = dir > 0 ? dir : -dir;
     uint16 pwm = (dirMag == 128) ? 65535 : dirMag << 9;
     digitalWrite(dirPin,(dir>0));//TODO1 Critical Assumption:  Byte division behavior need to be checked.
+    
+    if(pwm > 30000){
+      pwm = 30000;
+    }
     pwmWrite(pwmPin,pwm);
   }
   void update(){
+    
   }
   double readData(){
    // SerialUSB.println((double)count * 0.0166601);
@@ -281,7 +286,7 @@ int charCount;
 byte state;
 boolean wallDetect;
 void setup() {
-  gameStart = false;
+  gameStart = true;
   wallDetect = true;
   //noInterrupts();
 //  attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
@@ -295,7 +300,7 @@ void setup() {
 //  attachInterrupt(motorR.encoder1Pin,motorRISR,RISING);
   interrupts();
   greenRelease.attach(24);
-  greenRelease.write(0);
+  greenRelease.write(179);
   redRelease.attach(28);
   redRelease.write(0);
   //For Motor
@@ -352,14 +357,14 @@ void loop() {
           }
         }
         else if(ch == 'G'){//Release a Red
-          redRelease.write(90);
+          redRelease.write(179);
           delay(500);
           redRelease.write(0);
         }
         else if(ch = 'F'){//Release a Green
-          greenRelease.write(180);
+          greenRelease.write(170);
           delay(500);
-          greenRelease.write(0);
+          greenRelease.write(165);
         }else if (ch = 'H'){//Disable Wall Detect
           wallDetect = false;
         }
@@ -381,7 +386,7 @@ void loop() {
   
   uint32 cTime = micros();
   
-  if(gameStart&&cTime-tTime > 000000){
+  if(gameStart&&cTime-tTime > 2000000){
     motorG.set(-50);
     delay(400);
     motorG.set(50);
@@ -393,25 +398,25 @@ void loop() {
     //FRONT
   if(wallDetect){
     if (digitalRead(18) ||digitalRead(17)){
-      motorR.set(40);
+      motorR.set(60);
       motorL.set(-20);
-      delay(200);
+      delay(700);
       motorR.set(0);
       motorL.set(0);
     }
       //LEFT
     else if (digitalRead(19)){
-      motorR.set(30);
-      motorL.set(30);
-      delay(200);
+      motorR.set(-60);
+      motorL.set(-10);
+      delay(500);
       motorR.set(0);
       motorL.set(0);
     }  
       //RIGHT
     else if (digitalRead(16)){
-      motorR.set(-30);
-      motorL.set(-30);
-      delay(200);
+      motorR.set(10);
+      motorL.set(60);
+      delay(500);
       motorR.set(0);
       motorL.set(0);
     }//Back
@@ -446,5 +451,6 @@ void loop() {
   SerialUSB.print("||");
   SerialUSB.println(loc.dy);*/
 }
+
 
 

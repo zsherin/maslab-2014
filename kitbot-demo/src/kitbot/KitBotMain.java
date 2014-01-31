@@ -121,7 +121,7 @@ public class KitBotMain {
 			height = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT));
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 			JLabel preoutPane = createWindow("OpenCV preoutput", width, height);
-			state = 2;
+			state = 1;
 			//model.disableWallDetect();
 
 		//r forward
@@ -159,6 +159,13 @@ public class KitBotMain {
     			camera.read(frame);
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
+ 			    if(time - startTime >=180000000000000.0){
+ 			    	model.setMotors(0,0);
+ 			    	model.finalize();
+ 			    	while(true){
+ 			    		
+ 			    	}
+ 			    }
  			   //RED: 
 			    boolean teal=false;
 
@@ -224,18 +231,19 @@ public class KitBotMain {
  			    System.out.println("area of viewed thingy : " + area);
  			    System.out.println("x" + p.x +"y:"  +p.y);
  			    //Tracking
- 			    if(Double.isNaN(p.x)|| p.x == 0 || teal && area<20){ 
+ 			    if(Double.isNaN(p.x)|| p.x == 0 || (teal && area<20)){ 
  			    	p.x = frame.width()/2;
  			    	p.y = frame.height()/2;
- 			    	model.setMotors(-0.17,-0.08);
- 			    	if(maxArea>30000)
+ 			    	System.out.println("Wondering");
+ 			    	model.setMotors(-0.18,-0.07);
+ 			    	if(state==2&&maxArea>30000)
  			    	{
  			    		state=3;
  			    	}else{
  			    		continue;
  			    	}
  			    }
- 			    double rolMag = 0.5*((p.x - frame.width()/2 ) / frame.width());
+ 			    double rolMag = -((p.x - frame.width()/2 ) / frame.width());
  			    double camHeight = 0.1778;//m
  			    double desiredDist = -0.2;//m;
  			    double setCamAngle =  0.785398163;//radian
@@ -246,8 +254,7 @@ public class KitBotMain {
  			    	trackAngle = Math.PI/2 - 0.1 -setCamAngle;
  			    }
  			    double forMag = -(float)(frame.height()-p.y)/frame.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
- 			    if(teal)
- 			    {
+ 			    if(teal){
  			    	forMag = -Math.min((float)(46000-area)/(46000),.2);
  			    	rolMag *= 1.2;
  			    }
@@ -260,6 +267,7 @@ public class KitBotMain {
  			    	model.finalize();
  			    	break;
  			    }
+ 			    forMag = Math.max(forMag,-0.07);
  			    model.setMotors(forMag-rolMag, forMag+rolMag);//0.4,0.4);//
  			    //model.updatePos();
  			    //view.repaint();
