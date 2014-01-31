@@ -23,9 +23,11 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.*;
 
+import kitbot.BotClient;
 
 public class KitBotMain {
 	static Point oldP;
+	static int state;
 	private static Point GetClosest( List<MatOfPoint> contours, double dist)
 	   {
 		   int minArea = 10;
@@ -103,7 +105,14 @@ public class KitBotMain {
 		     width = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_WIDTH));
 			 height = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT));
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
-
+			
+			BotClient botclient = new BotClient("18.150.7.174:6667","mT82Qi240y",false);
+			
+			while( !botclient.gameStarted() ) {
+			}
+			System.out.println("***GAME STARTED***");
+			System.out.println("MAP --> " + botclient.getMap());
+			
 	    //Move 0.5 Meter forward
 		/*while(true){
 			model.updatePos();
@@ -128,11 +137,21 @@ public class KitBotMain {
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
  			   //RED: 
-			    Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
-			    //Core.inRange(frameOut,new Scalar(170,160,60) , new Scalar(180,256,256), maskTwo); 
-			    //GREEN:
-			    //Core.inRange(frameOut,new Scalar(38,160,60) , new Scalar(75,256,256), mask); 
-			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
+ 			    if(state ==1) //BALL COLLECT
+ 			    {
+				    Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
+				    //Core.inRange(frameOut,new Scalar(170,160,60) , new Scalar(180,256,256), maskTwo); 
+				    //GREEN:
+				    Core.inRange(frameOut,new Scalar(38,160,60) , new Scalar(75,256,256), maskTwo); 
+
+				    Core.bitwise_or(maskTwo, mask, mask);
+ 			    }
+ 			    if(state ==2) //SEEK GOAL
+ 			    {
+ 			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask); 
+ 				    Core.bitwise_or(maskTwo, mask, mask);
+ 			    }
+				Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
 			    /* No difference
 			    camera.release();1
 			    */

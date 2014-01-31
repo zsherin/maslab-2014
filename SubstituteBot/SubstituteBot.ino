@@ -49,7 +49,7 @@ void loop(){
   {
     mL.set(210);
     mR.set(-210);
-    delay(10);
+    delay(100);
     mL.set(0);
     mR.set(0);
   }
