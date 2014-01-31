@@ -1,12 +1,15 @@
 #include <avr/pgmspace.h>
+#include <Servo.h>
 #define DATA_1 (PORTC |=  0X01)    // DATA 1    // for UNO
 #define DATA_0 (PORTC &=  0XFE)    // DATA 0    // for UNO
 #define STRIP_PINOUT (DDRC=0xFF)    // for UNO
 int s0=3,s1=4,s2=5,s3=6;
+int offsetR=0;
+int offsetG=0;
 int flag=0;
 int counter=0;
 int countR=0,countG=0,countB=0;
-
+Servo sortServo;
 PROGMEM const unsigned long pattern_test_rainbow[10][10]={
   {0xff0000,0xff7f00,0xffff00,0x00ff00,0x0000ff,0x6f00ff,0x8f00ff,0x000000,0x000000,0x000000},
   {0x000000,0xff0000,0xff7f00,0xffff00,0x00ff00,0x0000ff,0x6f00ff,0x8f00ff,0x000000,0x000000},
@@ -20,7 +23,6 @@ PROGMEM const unsigned long pattern_test_rainbow[10][10]={
   {0xff7f00,0xffff00,0x00ff00,0x0000ff,0x6f00ff,0x8f00ff,0x000000,0x000000,0x000000,0xff0000},
 };
 void setup() {                
-
   STRIP_PINOUT;        // set output pin - DEBUG: should auto detect which mother board for use
 
   reset_strip();
@@ -28,8 +30,13 @@ void setup() {
   pinMode(s1,OUTPUT); 
   pinMode(s2,OUTPUT);
   pinMode(s3,OUTPUT);
+  sortServo.attach(9);
+  Serial.begin(9600);
   //noInterrupts();
-
+  TCS();
+  delay(2000);
+  offsetR = countR;
+  offsetG = countG;
 }
 
 void TCS()
@@ -64,7 +71,7 @@ else if(flag==2)
   {
    digitalWrite(s2,LOW);
    digitalWrite(s3,LOW); 
-   countR=counter/1.051;
+   countR=counter/1.051-offsetR;
    Serial.print("red=");
    Serial.println(countR,DEC);
    digitalWrite(s2,HIGH);
@@ -72,7 +79,7 @@ else if(flag==2)
   }
 else if(flag==3)
    {
-    countG=counter/1.0157;
+    countG=counter/1.0157-offsetG;
    Serial.print("green=");
    Serial.println(countG,DEC);
     digitalWrite(s2,LOW);
@@ -81,8 +88,8 @@ else if(flag==3)
 else if(flag==4)
    {
     countB=counter/1.114;
-   Serial.print("blue=");
-   Serial.println(countB,DEC);
+   //Serial.print("blue=");
+   //Serial.println(countB,DEC);
     digitalWrite(s2,LOW);
     digitalWrite(s3,LOW);
     }
@@ -96,33 +103,33 @@ else
 }
 void loop()
 {
- delay(10);
- TCS();
- if((countR>10)||(countG>10)||(countB>10))
+  sortServo.write(90);
+  send_1M_pattern(pattern_test_rainbow, 10, 70);
+  delay(10);
+  TCS();
+  if((countR>100)||(countG>40))
   {
-     if((countR>countG)&&(countR>countB))
-      {//REDID
-           delay(1000);
-      }
-     else if((countG>=countR)&&(countG>countB))
+     if(countG>=40)
       {//GreenID
-           delay(1000);
+        Serial.println("Green");
+        Serial.println("");
+        sortServo.write(150);
+        delay(1000);
       } 
-    else if((countB>countG)&&(countB>countR))
-     {//BlueID
-          delay(1000);
+    else if(countR>=100)
+     {//RedID
+        Serial.println("Red");
+        Serial.println("");
+        sortServo.write(0);
+        delay(1000);
      }
    }
- else 
- {
-    delay(1000);       
- }
+  else 
+  {
+    delay(500);       
+  }
 }
 
-void loop() 
-{
-  send_1M_pattern(pattern_test_rainbow, 10, 70);
-}
 
 void send_1M_pattern(const unsigned long data[][10], int pattern_no, int frame_rate)
 {
@@ -143,6 +150,7 @@ void send_1M_pattern(const unsigned long data[][10], int pattern_no, int frame_r
     delay(frame_rate);
 
   }
+}
   
 void send_strip(uint32_t data)
 {
