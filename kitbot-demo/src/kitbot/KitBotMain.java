@@ -29,7 +29,7 @@ public class KitBotMain {
 	static Point oldP;
 	static int state;
 	static double area;
-	private static Point GetClosest( List<MatOfPoint> contours, double dist)
+	private static Point GetClosest( List<MatOfPoint> contours, double dist, boolean teal)
 	   {
 		   int minArea = 10;
 		   
@@ -48,7 +48,10 @@ public class KitBotMain {
 		            double newDist = Math.sqrt(Math.pow((x-oldP.x), 2)+Math.pow((y-oldP.y), 2));
 		            if(newDist < dist)
 		            {
-		            	area = contourarea;
+		            	if(teal && contourarea>area)
+		            	{
+		            		area = contourarea;
+		            	}
 		            	p = new Point(x,y);
 		            	dist = newDist;
 		            }
@@ -144,6 +147,7 @@ public class KitBotMain {
  			    Imgproc.cvtColor(frame, frameOut, Imgproc.COLOR_BGR2HSV);
  			    frameOut.copyTo(mask);
  			   //RED: 
+ 			    boolean teal=false;
 
  			    if(state ==1) //BALL COLLECT
  			    {
@@ -157,6 +161,7 @@ public class KitBotMain {
  			    if(state ==2) //SEEK GOAL
  			    {
  			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask); 
+ 			    	teal=true;
  			    }
 				Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
 
@@ -170,7 +175,7 @@ public class KitBotMain {
 			    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 			    Imgproc.findContours(mask, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			   
-			    Point p = GetClosest(contours,10000000);
+			    Point p = GetClosest(contours,10000000, teal);
 			    //Imgproc.findContours(maskTwo, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			    
 			    //p = GetClosest(contours, ( Math.sqrt(Math.pow((p.x-oldP.x), 2)+Math.pow((p.y-oldP.y), 2))));
