@@ -294,7 +294,6 @@ public class KitBotMain {
  			    double forMag = -(float)(frameOut.height()-p.y)/frameOut.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
  			    if(teal)
  			    {
-
  			    	forMag = -Math.min((float)(46000-area)/(46000),.2);
  			    	rolMag *= 1.2;
  			    }
