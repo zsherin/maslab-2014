@@ -351,7 +351,7 @@ void loop() {
           while(true){
           }
         }
-        else if(ch == 'E'){//Release a Red
+        else if(ch == 'G'){//Release a Red
           redRelease.write(90);
           delay(500);
           redRelease.write(0);
@@ -360,7 +360,7 @@ void loop() {
           greenRelease.write(180);
           delay(500);
           greenRelease.write(0);
-        }else if (ch = 'G'){//Disable Wall Detect
+        }else if (ch = 'H'){//Disable Wall Detect
           wallDetect = false;
         }
         break;
