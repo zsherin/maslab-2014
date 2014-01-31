@@ -279,8 +279,10 @@ void motorRISR(){ motorR.sample();}
 boolean gameStart;
 int charCount;
 byte state;
+boolean wallDetect;
 void setup() {
   gameStart = false;
+  wallDetect = true;
   noInterrupts();
 //  attachInterrupt(ultra1.echo, ultra1ISR, CHANGE);
 //  attachInterrupt(ultra2.echo, ultra2ISR, CHANGE);
@@ -353,9 +355,15 @@ void loop() {
         }
         else if(ch == 'E'){//Release a Red
           redRelease.write(90);
+          delay(500);
+          redRelease.write(0);
         }
         else if(ch = 'F'){//Release a Green
           greenRelease.write(180);
+          delay(500);
+          greenRelease.write(0);
+        }else if (ch = 'G'){//Disable Wall Detect
+          wallDetect = false;
         }
         break;
       case 0x01: //In Motor
@@ -385,36 +393,38 @@ void loop() {
   //Internal Sensor Updates
   //Wall Detection
     //FRONT
-  if (digitalRead(18) ||digitalRead(17)){
-    motorR.set(20);
-    motorL.set(-20);
-    delay(200);
-    motorR.set(0);
-    motorL.set(0);
+  if(wallDetect){
+    if (digitalRead(18) ||digitalRead(17)){
+      motorR.set(20);
+      motorL.set(-20);
+      delay(200);
+      motorR.set(0);
+      motorL.set(0);
+    }
+      //LEFT
+    else if (digitalRead(19)){
+      motorR.set(20);
+      motorL.set(20);
+      delay(200);
+      motorR.set(0);
+      motorL.set(0);
+    }  
+      //RIGHT
+    else if (digitalRead(16)){
+      motorR.set(-20);
+      motorL.set(-20);
+      delay(200);
+      motorR.set(0);
+      motorL.set(0);
+    }//Back
+    else if (digitalRead(15)){
+      motorR.set(-20);
+      motorL.set(20);
+      delay(200);
+      motorR.set(0);
+      motorL.set(0);
+    }  
   }
-    //LEFT
-  else if (digitalRead(19)){
-    motorR.set(20);
-    motorL.set(20);
-    delay(200);
-    motorR.set(0);
-    motorL.set(0);
-  }  
-    //RIGHT
-  else if (digitalRead(16)){
-    motorR.set(-20);
-    motorL.set(-20);
-    delay(200);
-    motorR.set(0);
-    motorL.set(0);
-  }//Back
-  else if (digitalRead(15)){
-    motorR.set(-20);
-    motorL.set(20);
-    delay(200);
-    motorR.set(0);
-    motorL.set(0);
-  }  
   
   //Relative Localization.
   /*if(gTime-cTime > 10){

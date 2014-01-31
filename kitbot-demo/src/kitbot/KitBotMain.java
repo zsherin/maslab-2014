@@ -140,8 +140,10 @@ public class KitBotMain {
 			*/
         //Chase Ball
     	long time = System.nanoTime();
+    	long startTime = time;
     	while ( true ) {
     		try {
+    			
     			long duration = (System.nanoTime()- time)/(long)Math.pow(10.0,9.0);// In seconds
     			System.out.println("Current Fps:"+ 1.0/duration + "frame/Second.");
     			time = time + duration;
@@ -150,6 +152,12 @@ public class KitBotMain {
  			    frameOut.copyTo(mask);
  			   //RED: 
  			    boolean teal = false;
+ 			    //State Change Timer
+ 			    if(state == 1&&time - startTime > 120000000000000.0){//After the first two minutes
+ 			    	state = 2;
+ 			    }
+ 			    
+ 			    //State Target
  			    if(state ==1) //BALL COLLECT
  			    {
 				    Core.inRange(frameOut,new Scalar(0,0,0) , new Scalar(10,256,256), mask); 
@@ -161,7 +169,7 @@ public class KitBotMain {
 
 				    Core.bitwise_or(maskTwo, mask, mask);
  			    }
- 			    if(state ==2) //SEEK GOAL
+ 			    else if(state ==2) //SEEK GOAL
  			    {
  			    	teal = true;
  			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask); 
