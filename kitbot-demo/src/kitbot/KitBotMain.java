@@ -27,6 +27,7 @@ import kitbot.BotClient;
 
 public class KitBotMain {
 	static Point oldP;
+	static Point velocity;
 	static int state;
 	static double area;
 	static double maxArea;
@@ -66,6 +67,28 @@ public class KitBotMain {
 		   oldP=p;
 		   return p;
 	   }
+	private static Point GetLargest( List<MatOfPoint> contours)
+	   {
+		   double curMax = 0;
+		   Point p = new Point();
+		
+		   for (int idx = 0; idx < contours.size(); idx++) {
+		        Mat contour = contours.get(idx);
+		        double contourarea = Imgproc.contourArea(contour);
+		        if (contourarea > curMax) 
+		        {
+		        	curMax = contourarea;
+		        	Moments mu = Imgproc.moments(contour, true);
+		            int x = (int) (mu.get_m10() / mu.get_m00());
+		            int y = (int) (mu.get_m01() / mu.get_m00());
+
+				   
+		            p = new Point(x,y);
+		            
+		        }
+		    }
+		   return p;
+	   }
 	
     public static void main(String[] args) {
     	int width = 1366;
@@ -91,8 +114,8 @@ public class KitBotMain {
     	 System.out.println("Hello, OpenCV");
 		    // Load the native library.
 		    System.loadLibrary("opencv_java248");
-		    VideoCapture camera = new VideoCapture(1);
-		    camera.open(1);// AC-useless? //Not Useless, actually //AC- Yay!
+		    VideoCapture camera = new VideoCapture(0);
+		    camera.open(0);// AC-useless? //Not Useless, actually //AC- Yay!
 		    boolean hset = camera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,480);
 		    boolean wset = camera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,720);
 		    System.out.println(hset);
@@ -110,6 +133,7 @@ public class KitBotMain {
 		    Mat frameOut = new Mat();
 
 		    oldP = new Point(0,0);
+		    velocity = new Point(0,0);
 		    Mat mask = new Mat();
 		    Mat maskTwo = new Mat();
 		    Mat maskOut = new Mat();
@@ -121,7 +145,7 @@ public class KitBotMain {
 			height = (int) (camera.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT));
 			JLabel opencvPane = createWindow("OpenCV output", width, height);
 			JLabel preoutPane = createWindow("OpenCV preoutput", width, height);
-			state = 2;
+			state = 1;
 			//model.disableWallDetect();
 
 		//r forward
@@ -150,7 +174,7 @@ public class KitBotMain {
         //Chase Ball
     	long time = System.nanoTime();
     	long startTime = time;
-    	double MotorVal = 0.15;
+    	double MotorVal = -0.15;
     	while ( true ) {
     		try {
     			long duration = (System.nanoTime()- time)/(long)Math.pow(10.0,9.0);// In seconds
@@ -161,16 +185,24 @@ public class KitBotMain {
  			    frameOut.copyTo(mask);
  			   //RED: 
 			    boolean teal=false;
-
  			    //State Change Timer
  			    if(state == 1&&time - startTime > 120000000000000.0){//After the first two minutes
  			    	state = 2;
  			    	model.disableWallDetect();
  			    }
+			    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
  			    
  			    //State Target
  			    if(state ==1) //BALL COLLECT
- 			    {
+ 			    { 
+ 			    	Mat blueMask = new Mat();
+ 			    	Core.inRange(frameOut,new Scalar(100,100,100) , new Scalar(110,256,256), blueMask); 
+
+ 				    Imgproc.findContours(blueMask, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+ 				    Point p = GetLargest(contours);
+ 				    
+ 					frameOut = new Mat(frameOut,new Rect(0,(int)p.y,width,height-(int)p.y));
+ 					
 				    Core.inRange(frameOut,new Scalar(0,100,100) , new Scalar(10,256,256), mask); 
 				    Core.inRange(frameOut,new Scalar(170,160,60) , new Scalar(180,256,256), maskTwo);
 				    Core.bitwise_or(maskTwo, mask, mask);
@@ -186,7 +218,8 @@ public class KitBotMain {
  			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask); 
  			    	teal=true;
  			    }
-				Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
+ 			    
+ 			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
 				
 				Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(10,10));
 				Imgproc.erode(maskOut,maskOut,element);
@@ -199,7 +232,6 @@ public class KitBotMain {
 			    camera.release();1
 			    */
 			    //Okay! Here's the contour finding for getting the center of mass of each blob
-			    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 			    Imgproc.findContours(mask, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			   
 			    Point p = GetClosest(contours,10000000, teal);
@@ -210,10 +242,10 @@ public class KitBotMain {
 			    //p = GetClosest(contours, ( Math.sqrt(Math.pow((p.x-oldP.x), 2)+Math.pow((p.y-oldP.y), 2))));
 
 			    
-            	Core.circle(frame, p, 12, new Scalar(255,49,0,255));
+            	Core.circle(frameOut, p, 12, new Scalar(255,49,0,255));
             	oldP =p;
 
-				updateWindow(opencvPane, frame);
+				updateWindow(opencvPane, frameOut);
 				//updateWindow(preoutPane, mask);
 				
 				//State 2=> 3
@@ -227,12 +259,17 @@ public class KitBotMain {
  			    if(Double.isNaN(p.x)|| p.x == 0 || teal && area<20){ 
  			    	p.x = frame.width()/2;
  			    	p.y = frame.height()/2;
- 			    	model.setMotors(-0.17,-0.08);
+ 			    	
  			    	if(maxArea>30000)
  			    	{
  			    		state=3;
- 			    	}else{
+ 			    		
+ 			    	}
+ 			    	else{
+ 			    		velocity = new Point(-.17,-.08);
+ 			    		model.setMotors(-0.17,-0.08);
  			    		continue;
+ 			    		
  			    	}
  			    }
  			    double rolMag = 0.5*((p.x - frame.width()/2 ) / frame.width());
@@ -245,15 +282,18 @@ public class KitBotMain {
  			    if(trackAngle + setCamAngle > Math.PI/2-0.1){ //Set hard limit that ball can only be 2m away.
  			    	trackAngle = Math.PI/2 - 0.1 -setCamAngle;
  			    }
- 			    double forMag = -(float)(frame.height()-p.y)/frame.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
+ 			    double forMag = -(float)(frameOut.height()-p.y)/frameOut.height();//2*(Math.tan(trackAngle+setCamAngle)*camHeight-desiredDist);
  			    if(teal)
  			    {
  			    	forMag = -Math.min((float)(46000-area)/(46000),.2);
  			    	rolMag *= 1.2;
  			    }
  			    else if(state ==3){
- 			    	forMag = MotorVal;
- 			    	MotorVal -= 0.01;
+ 			    	if(MotorVal!=0)
+ 			    	{
+	 			    	forMag = MotorVal;
+	 			    	MotorVal += 0.01;
+ 			    	}
  			    }
  			    System.out.println("Forward:" + forMag);
  			    if(controller.EmgStop == true){

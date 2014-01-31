@@ -15,7 +15,7 @@ public class Mat2Image {
     public static BufferedImage getImage(Mat mat) {
         allocateTempSpace(mat);
         Mat convMat = new Mat(mat.size(), mat.type());
-       // Imgproc.cvtColor(mat, convMat, Imgproc.COLOR_BGR2RGB);
+        //Imgproc.cvtColor(mat, convMat, Imgproc.COLOR_GRAY2RGB);
         Imgproc.cvtColor(mat, convMat, Imgproc.COLOR_BGR2RGB);
         convMat.get(0, 0, dat);
         img.getRaster().setDataElements(0, 0, img.getWidth(), img.getHeight(), dat);
