@@ -28,9 +28,11 @@ import kitbot.BotClient;
 public class KitBotMain {
 	static Point oldP;
 	static int state;
+	static double area;
 	private static Point GetClosest( List<MatOfPoint> contours, double dist)
 	   {
 		   int minArea = 10;
+		   
 		   Point p = new Point();
 		   for (int idx = 0; idx < contours.size(); idx++) {
 		        Mat contour = contours.get(idx);
@@ -46,6 +48,7 @@ public class KitBotMain {
 		            double newDist = Math.sqrt(Math.pow((x-oldP.x), 2)+Math.pow((y-oldP.y), 2));
 		            if(newDist < dist)
 		            {
+		            	area=contourarea;
 		            	p = new Point(x,y);
 		            	dist = newDist;
 		            }
@@ -154,15 +157,12 @@ public class KitBotMain {
  			    if(state ==2) //SEEK GOAL
  			    {
  			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask); 
- 				    Core.bitwise_or(maskTwo, mask, mask);
  			    }
 				Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
 
 			   // Core.inRange(frameOut,new Scalar(0,160,60) , new Scalar(10,256,256), mask); 
 			   // Core.inRange(frameOut,new Scalar(170,160,60) , new Scalar(180,256,256), mask); 
 			    //GREEN:
-			    Core.inRange(frameOut,new Scalar(38,160,60) , new Scalar(75,256,256), mask); 
-			    Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
 			    /* No difference
 			    camera.release();1
 			    */
