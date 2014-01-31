@@ -103,22 +103,23 @@ else
 }
 void loop()
 {
-  sortServo.write(90);
-  send_1M_pattern(pattern_test_rainbow, 10, 70);
+  sortServo.write(100);
+  send_1M_pattern(pattern_test_rainbow, 10, 30);
   TCS();
-  if((countR>100)||(countG>40))
+  if((countR>150)||(countG>60))
   {
-     if(countG>=40){//GreenID
+     if(countG>=60){//GreenID
         Serial.println("Green");
         Serial.println("");
         sortServo.write(150);
-        delay(3000);
-      }else if(countR>=100){//RedID
+        delay(1000);
+      }else if(countR>=150){//RedID
         Serial.println("Red");
         Serial.println("");
-        sortServo.write(0);
-        delay(3000);
+        sortServo.write(40);
+        delay(1000);
      }
+     counter = 0;
    }
   else 
   {
