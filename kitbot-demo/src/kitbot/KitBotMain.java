@@ -48,11 +48,7 @@ public class KitBotMain {
 		            double newDist = Math.sqrt(Math.pow((x-oldP.x), 2)+Math.pow((y-oldP.y), 2));
 		            if(newDist < dist)
 		            {
-<<<<<<< HEAD
-		            	area=contourarea;
-=======
 		            	area = contourarea;
->>>>>>> 2a21d35a20555d024540ec09e05c97ada53b771e
 		            	p = new Point(x,y);
 		            	dist = newDist;
 		            }
@@ -160,11 +156,7 @@ public class KitBotMain {
  			    }
  			    if(state ==2) //SEEK GOAL
  			    {
-<<<<<<< HEAD
  			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask); 
-=======
- 			    	Core.inRange(frameOut,new Scalar(80,160,160) , new Scalar(100,256,256), mask);
->>>>>>> 2a21d35a20555d024540ec09e05c97ada53b771e
  			    }
 				Imgproc.GaussianBlur(mask, maskOut,new Size(3,3), .2,.2);
 
